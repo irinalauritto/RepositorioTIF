@@ -1,0 +1,1 @@
+# Este archivo puede estar vacío si no necesitas inicialización especial

@@ -1,0 +1,1 @@
+# En este archivo iría la definción de otra clase
