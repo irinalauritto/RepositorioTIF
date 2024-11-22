@@ -1,0 +1,71 @@
+\chapter{Dependencias del proyecto}
+\hypertarget{md__c_1_2_repositorio_t_i_f_2_software_2_trabajo_integrador_final___fisio_2deps_2_r_e_a_d_m_e}{}\label{md__c_1_2_repositorio_t_i_f_2_software_2_trabajo_integrador_final___fisio_2deps_2_r_e_a_d_m_e}\index{Dependencias del proyecto@{Dependencias del proyecto}}
+\label{md__c_1_2_repositorio_t_i_f_2_software_2_trabajo_integrador_final___fisio_2deps_2_r_e_a_d_m_e_autotoc_md1}%
+\Hypertarget{md__c_1_2_repositorio_t_i_f_2_software_2_trabajo_integrador_final___fisio_2deps_2_r_e_a_d_m_e_autotoc_md1}%
+ Carpeta para registrar los módulos que necesiten ser instalados para que nuestro proyecto sea reproducible.\hypertarget{md__c_1_2_repositorio_t_i_f_2_software_2_trabajo_integrador_final___fisio_2deps_2_r_e_a_d_m_e_autotoc_md2}{}\doxysection{\texorpdfstring{Uso de entornos virtuales}{Uso de entornos virtuales}}\label{md__c_1_2_repositorio_t_i_f_2_software_2_trabajo_integrador_final___fisio_2deps_2_r_e_a_d_m_e_autotoc_md2}
+Un "{}\+Entorno"{} en Python es el contexto en el que se ejecuta un programa de Python que consta de un intérprete y una cantidad de paquetes instalados.\hypertarget{md__c_1_2_repositorio_t_i_f_2_software_2_trabajo_integrador_final___fisio_2deps_2_r_e_a_d_m_e_autotoc_md3}{}\doxysubsection{\texorpdfstring{Entorno global\+:}{Entorno global\+:}}\label{md__c_1_2_repositorio_t_i_f_2_software_2_trabajo_integrador_final___fisio_2deps_2_r_e_a_d_m_e_autotoc_md3}
+Por defecto, cualquier intérprete de Python instalado se ejecuta en su propio entorno global. Por ejemplo, si se ejecuta el comando python o python3 en alguna terminal (dependiendo de cómo se haya instalado Python), se estaría ejecutando en el entorno global de ese intérprete. Cualquier paquete que se instale o desinstale afecta el entorno global y por tanto todos los programas que se ejecutan en él.
+
+En Python, es una buena práctica crear un entorno específico de un espacio de trabajo o entorno virtual local.\hypertarget{md__c_1_2_repositorio_t_i_f_2_software_2_trabajo_integrador_final___fisio_2deps_2_r_e_a_d_m_e_autotoc_md4}{}\doxysubsection{\texorpdfstring{Entorno virtual local\+:}{Entorno virtual local\+:}}\label{md__c_1_2_repositorio_t_i_f_2_software_2_trabajo_integrador_final___fisio_2deps_2_r_e_a_d_m_e_autotoc_md4}
+Este tipo de entorno te permite instalar módulos de python sin afectar otros entornos aislando la instalación de los módulos del espacio de trabajo.\hypertarget{md__c_1_2_repositorio_t_i_f_2_software_2_trabajo_integrador_final___fisio_2deps_2_r_e_a_d_m_e_autotoc_md5}{}\doxysubsection{\texorpdfstring{Creación de entorno virtual local en VSCode}{Creación de entorno virtual local en VSCode}}\label{md__c_1_2_repositorio_t_i_f_2_software_2_trabajo_integrador_final___fisio_2deps_2_r_e_a_d_m_e_autotoc_md5}
+
+\begin{DoxyItemize}
+\item Abrir la paleta de comandos, {\bfseries{Command Palette}} ({\ttfamily Ctrl+\+Shift+P}). Buscar y seleccionar el comando {\bfseries{Python\+: Create Environment}}
+\end{DoxyItemize}
+
+
+
+
+\begin{DoxyItemize}
+\item Una vez seleccionado el comando, se presenta una lista de tipos de entornos\+: {\bfseries{Venv}} o {\bfseries{Conda}}
+\end{DoxyItemize}
+
+
+
+
+\begin{DoxyItemize}
+\item Seleccionar el tipo de entorno {\bfseries{Venv}}, el comando presenta una lista de los intérpretes disponibles que pueden utilizarse como base para el nuevo entorno virtual
+\end{DoxyItemize}
+
+
+
+
+\begin{DoxyItemize}
+\item Luego de seleccionar el intérprete, se mostrará una notificación con el progreso de la creación de la carpeta del entorno
+\end{DoxyItemize}
+
+
+
+
+\begin{DoxyItemize}
+\item Una vez creado nuestro entorno virtual, el mismo debe ser activado usando el siguiente comando en la terminal de VSCode\+: {\ttfamily \& .venv\textbackslash{}Scripts\textbackslash{}Activate.\+ps1}
+\end{DoxyItemize}\hypertarget{md__c_1_2_repositorio_t_i_f_2_software_2_trabajo_integrador_final___fisio_2deps_2_r_e_a_d_m_e_autotoc_md6}{}\doxysubsubsection{\texorpdfstring{⚠️}{⚠️}}\label{md__c_1_2_repositorio_t_i_f_2_software_2_trabajo_integrador_final___fisio_2deps_2_r_e_a_d_m_e_autotoc_md6}
+En Windows al ejecutar el comando anterior nos puede aparecer el mensaje\+: "{}\+File D\+:\textbackslash{}\+Prog\+Avanzada\+Python\textbackslash{}\+Ejercicios\textbackslash{}\+Trabajo\+Practico\+\_\+1\textbackslash{}.\+venv\textbackslash{}\+Scripts\textbackslash{}\+Activate.\+ps1 cannot be loaded because running scripts is disabled on this system.  \+For more information, see about\+\_\+\+Execution\+\_\+\+Policies at https\+:/go.\+microsoft.\+com/fwlink/?\+Link\+ID=135170."{} En este caso es necesario ingresar el siguiente comando en la terminal\+:
+
+{\ttfamily Set-\/\+Execution\+Policy -\/Execution\+Policy Remote\+Signed -\/Scope Process}
+
+
+\begin{DoxyItemize}
+\item Al ejecutar los comandos anteriores, aparece la etiqueta (.venv) en la entrada de comando indicando que se activó el entorno\+:
+\end{DoxyItemize}
+
+
+
+
+\begin{DoxyItemize}
+\item Una vez activado nuestro entorno, podemos instalar los módulos necesarios para nuestro proyecto usando pip desde la terminal de VSCode.
+\item Para desactivar el entorno ejecutar {\ttfamily deactivate} en la terminal de VSCode
+\end{DoxyItemize}\hypertarget{md__c_1_2_repositorio_t_i_f_2_software_2_trabajo_integrador_final___fisio_2deps_2_r_e_a_d_m_e_autotoc_md7}{}\doxysubsection{\texorpdfstring{Generación del archivo "{}requirements.\+txt"{}}{Generación del archivo "{}requirements.\+txt"{}}}\label{md__c_1_2_repositorio_t_i_f_2_software_2_trabajo_integrador_final___fisio_2deps_2_r_e_a_d_m_e_autotoc_md7}
+"{}requirements.\+txt"{} es el archivo que guardará los nombres de los módulos instalados para nuestro proyecto, así como las versiones de los mismos.
+
+Para generar este archivo en la carpeta {\ttfamily deps/} ejecutar en la terminal de VSCode\+:
+
+{\ttfamily pip freeze \texorpdfstring{$>$}{>} deps/requirements.\+txt}.
+
+Un archivo con ese nombre se creará en la carpeta correspondiente de nuestro proyecto. Un ejemplo del mismo se puede ver a continuación\+:
+
+
+
+En el futuro se puede reproducir este entorno a partir del "{}requirements.\+txt"{}, ejecutando el siguiente comando en un entorno virtual nuevo\+:
+
+{\ttfamily pip install -\/r deps/requirements.\+txt} 
