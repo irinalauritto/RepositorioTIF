@@ -1,42 +1,24 @@
 """
-Proyecto Final Integrador - Oximetría de Pulso
+Trabajo Integrador Final de Fisiología
 ==============================================
 
 General Description
 -------------------
-En este proyecto se encuentra una parte del proyecto final presentado en la cátedra de Electrónica Programable por las alumnas Josefina Giorgi e Irina Lauritto.
-Este código adquiere datos de la oximetría de pulso y envía parámetros como la frecuencia cardíaca y la saturación de oxígeno en sangre, a través de BLE para su visualización en una aplicación móvil.
-
-Hardware Connection
--------------------
-+-----------------+---------------+
-| ODP Módulo      | EDU-ESP       |
-+=================+===============+
-| SCL             | SCL           |
-+-----------------+---------------+
-| SDA             | SDA           |
-+-----------------+---------------+
-| GND             | GND           |
-+-----------------+---------------+
-| +3V             | +3V           |
-+-----------------+---------------+
-| EN              | +3V           |
-+-----------------+---------------+
-| INT             | GPIO_1        |
-+-----------------+---------------+
+En este proyecto se encuentra el main del TIF de fisiología sobre simulación del ojo humano. 
 
 Changelog
 ---------
 +------------+---------------------------------------------+
 | Date       | Description                                 |
 +============+=============================================+
-| 11/11/2024 | Entrega del proyecto Final Integrador.      |
+| 22/11/2024 | Creación del documento                      |
 +------------+---------------------------------------------+
 
 Authors
 -------
 - Josefina Giorgi (josefina.giorgi@ingenieria.uner.edu.ar)
 - Irina Lauritto (irina.lauritto@ingenieria.uner.edu.ar)
+- Joaquín Machado (joaquin.machado@ingenieria.uner.edu.ar)
 """
 from apps.app_principal import ejecutar_gui
 
