@@ -1,43 +1,53 @@
 import tkinter as tk
-from tkinter import messagebox
-from modules.clase1 import Procesador
+
+class AplicacionPrincipal:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Visor de Archivos de Directorio")
+        self.root.geometry("500x400")
+
+        self.label_directorio = tk.Label(self.root, text="Directorio no seleccionado", anchor="w")
+        self.label_directorio.pack(fill="x", padx=10, pady=5)
+
+        self.boton_abrir = tk.Button(self.root, text="Seleccionar Directorio", command=self.seleccionar_directorio)
+        self.boton_abrir.pack(pady=5)
+
+        self.listbox_archivos = tk.Listbox(self.root, width=60, height=20)
+        self.listbox_archivos.pack(padx=10, pady=5)
+
+        self.boton_refrescar = tk.Button(self.root, text="Actualizar", command=self.mostrar_archivos)
+        self.boton_refrescar.pack(pady=5)
+
+        self.directorio = None
+
+    def seleccionar_directorio(self):
+        from tkinter import filedialog, messagebox
+        self.directorio = filedialog.askdirectory(title="Seleccionar Directorio")
+        if self.directorio:
+            self.label_directorio.config(text=f"Directorio: {self.directorio}")
+            self.mostrar_archivos()
+        else:
+            messagebox.showinfo("Información", "No se seleccionó ningún directorio.")
+
+    def mostrar_archivos(self):
+        import os
+        if not self.directorio:
+            from tkinter import messagebox
+            messagebox.showwarning("Advertencia", "Primero selecciona un directorio.")
+            return
+
+        self.listbox_archivos.delete(0, tk.END)
+
+        try:
+            archivos = os.listdir(self.directorio)
+            for archivo in archivos:
+                if archivo not in [".", ".."]:
+                    self.listbox_archivos.insert(tk.END, archivo)
+        except Exception as e:
+            from tkinter import messagebox
+            messagebox.showerror("Error", f"Error al leer el directorio: {e}")
 
 def ejecutar_gui():
-    """Lanza una aplicación GUI simple."""
-    # Crear la ventana principal
-    ventana = tk.Tk()
-    ventana.title("Simulación del Ojo Humano")
-    ventana.geometry("400x200")  # Tamaño de la ventana (ancho x alto)
-
-    # Crear instancia de la clase Procesador
-    procesador = Procesador()
-
-    # Función para manejar el evento de botón
-    def procesar_texto():
-        texto_entrada = entrada.get()  # Obtiene el texto de la entrada
-        procesador.dato = texto_entrada
-        resultado = procesador.procesar_dato()  # Procesa el dato
-        salida.config(text=f"Resultado: {resultado}")  # Muestra el resultado
-        messagebox.showinfo("Procesado", "El dato fue procesado con éxito.")
-
-    # Etiqueta de descripción
-    etiqueta = tk.Label(ventana, text="Ingresa un texto para procesar:")
-    etiqueta.pack(pady=10)  # Margen vertical
-
-    # Entrada de texto
-    entrada = tk.Entry(ventana, width=30)
-    entrada.pack(pady=5)
-
-    # Botón para procesar
-    boton_procesar = tk.Button(ventana, text="Procesar", command=procesar_texto)
-    boton_procesar.pack(pady=10)
-
-    # Etiqueta para mostrar el resultado
-    salida = tk.Label(ventana, text="Resultado: ")
-    salida.pack(pady=10)
-
-    # Inicia el bucle de la aplicación
-    ventana.mainloop()
-
-if __name__ == "__main__":
-    ejecutar_gui()
+    root = tk.Tk()
+    app = AplicacionPrincipal(root)
+    root.mainloop()
