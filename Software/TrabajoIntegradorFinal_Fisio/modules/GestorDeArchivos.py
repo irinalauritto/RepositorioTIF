@@ -1,9 +1,10 @@
 import os
 
-class espacioDeTrabajo:
+class gestorDeArchivos:
     """Clase para obtener listado de archivos de imagen desde el directorio."""
-    def __init__(self):
+    def __init__(self, nombre):
         self.listado_de_archivos = []
+        self.nombre = nombre
 
     def extraer_listado_de_archivos(self, p_directorio):
         """Obtiene el listado de archivos en el directorio especificado."""

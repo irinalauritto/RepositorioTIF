@@ -1,7 +1,11 @@
 import tkinter as tk
+import modules.GestorDeArchivos as ga
 
 class AplicacionPrincipal:
     def __init__(self, root):
+
+        gArchivos = ga.gestorDeArchivos("Gestor de Archivos")
+
         self.root = root
         self.root.title("Visor de Archivos de Directorio")
         self.root.geometry("500x400")
