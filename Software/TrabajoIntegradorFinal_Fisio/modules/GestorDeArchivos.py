@@ -1,14 +1,16 @@
 import os
 
 class gestorDeArchivos:
-    """Clase para obtener listado de archivos de imagen desde el directorio."""
+    """Clase para obtener listado de archivos desde el directorio."""
     def __init__(self, nombre):
         self.listado_de_archivos = []
         self.nombre = nombre
+        self.directorio = None
 
-    def extraer_listado_de_archivos(self, p_directorio):
+    def extraeListadoDeArchivos(self, p_directorio):
         """Obtiene el listado de archivos en el directorio especificado."""
         aux_listado_de_archivos = []
+        self.directorio = p_directorio
 
         if os.path.isdir(p_directorio):
             # Listar todos los elementos del directorio
