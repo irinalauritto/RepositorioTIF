@@ -1,12 +1,14 @@
 import tkinter as tk
 from PIL import Image, ImageTk
 import os
+import numpy as np
 
-class GestorDeImagenes:
+class gestorDeImagenes:
     """Clase para mostrar imágenes en una nueva ventana."""
     def __init__(self, directorio):
         self.directorio = directorio
         self.imagenes = []
+        self.image_array = []
         self.cargar_imagenes()
 
     def cargar_imagenes(self):
@@ -25,8 +27,10 @@ class GestorDeImagenes:
 
         for img_path in self.imagenes:
             img = Image.open(img_path)
-            img = img.resize((200, 200), Image.ANTIALIAS)
-            img_tk = ImageTk.PhotoImage(img)
+            img = img.resize((500, 500))
+            img_array = np.array(img)  # Convertir la imagen a una matriz de píxeles
+            self.image_array.append(img_array)
+            img_tk = ImageTk.PhotoImage(Image.fromarray(img_array))
 
             label = tk.Label(ventana_imagenes, image=img_tk)
             label.image = img_tk  # Keep a reference to avoid garbage collection
