@@ -1,11 +1,19 @@
 import tkinter as tk
 from tkinter import messagebox
+from tkinter import font as tkFont
 from PIL import Image, ImageTk
 import modules.GestorDeArchivos as ga
 import modules.GestorDeImagenes as gi
 
 gArchivos = ga.gestorDeArchivos("Gestor de Archivos")
-#gImagen = gi.gestorDeImagenes("Gestor de Imagenes")
+gArchivos.extraeListadoDeArchivos("\\RepositorioTIF\\Software\\TrabajoIntegradorFinal_Fisio\\imagenes_nuevas")
+directoriosImagenes = gArchivos.getListadoDeArchivos()
+gImagen = gi.gestorDeImagenes("Gestor de Imagenes")
+
+# Imprimir los archivos cargados para verificar
+print("Archivos cargados desde el directorio:")
+for archivo in directoriosImagenes:
+    print(archivo)
 
 class AplicacionPrincipal:
     """Clase principal de la aplicación."""
@@ -14,47 +22,49 @@ class AplicacionPrincipal:
         self.root.title("Simulador del ojo humano")
         self.root.geometry("900x500")
         
-        #crear la barra de tareas
+        # Crear la barra de tareas
         self.frameBarraTareas = tk.Frame(self.root)
         self.frameBarraTareas.pack(fill='x')
 
-        #Botón para seleccionar imágenes
-        directoriosImagenes = gArchivos.extraeListadoDeArchivos("Imagenes")
-        imagenes = ["imagen 1", "imagen 2", "imagen 3", "imagen 4", "imagen 5"]
-        imagenSeleccionada = tk.StringVar(root)
-        imagenSeleccionada.set("Seleccionar imagen")
+        # Botón para seleccionar imágenes
+        imagenes = ["Arbol", "Corazón", "Estrella colorida", "Estrella", "Flecha"]
+        self.imagenSeleccionada = tk.StringVar(root)
+        self.imagenSeleccionada.set("Seleccionar imagen")
 
-        menu_button_imagen = tk.Menubutton(self.frameBarraTareas, text="Seleccionar Imagen", relief=tk.FLAT, bg='gray')
+        menu_button_imagen = tk.Menubutton(self.frameBarraTareas, text="Seleccionar Imagen", relief=tk.RAISED)
         menu_button_imagen.menu = tk.Menu(menu_button_imagen, tearoff=0)
         menu_button_imagen["menu"] = menu_button_imagen.menu
-         
-
-        for imagen in imagenes:
-            menu_button_imagen.menu.add_radiobutton(label = imagen, variable = imagenSeleccionada, value = imagen)
+       
+        for i, imagen in enumerate(imagenes):
+            menu_button_imagen.menu.add_radiobutton(label=imagen, variable=self.imagenSeleccionada, value=imagen, command=lambda i=i: self.mostrar_imagen(i))
 
         menu_button_imagen.pack(side='left', padx=5, pady=5)
         
-        print(imagenSeleccionada)
-
         # Botón "Preguntas"
-        preguntasBoton = tk.Button(self.frameBarraTareas, text="Preguntas", command=lambda: messagebox.showinfo("Preguntas", "Aquí van las preguntas."),relief=tk.FLAT, bg='gray')
+        preguntasBoton = tk.Button(self.frameBarraTareas, text="Preguntas", command=lambda: messagebox.showinfo("Preguntas", "Aquí van las preguntas."), relief=tk.RAISED)
         preguntasBoton.pack(side='left', padx=5, pady=5)
 
         # Botón "Ayuda"
-        ayudaBoton = tk.Button(self.frameBarraTareas, text="Ayuda", command=lambda: messagebox.showinfo("Ayuda", "Aquí va la ayuda."), relief=tk.FLAT, bg='gray')
+        ayudaBoton = tk.Button(self.frameBarraTareas, text="Ayuda", command=lambda: messagebox.showinfo("Ayuda", "Aquí va la ayuda."), relief=tk.RAISED)
         ayudaBoton.pack(side='left', padx=5, pady=5)
 
         # Botón "Imágenes de Prueba"
-        ImagenesPruebaBoton = tk.Button(self.frameBarraTareas, text="Imágenes de Prueba", command=lambda: messagebox.showinfo("Imágenes de Prueba", "Aquí van las imágenes de prueba."), relief=tk.FLAT, bg='gray')
+        ImagenesPruebaBoton = tk.Button(self.frameBarraTareas, text="Imágenes de Prueba", command=lambda: messagebox.showinfo("Imágenes de Prueba", "Aquí van las imágenes de prueba."), relief=tk.RAISED)
         ImagenesPruebaBoton.pack(side='left', padx=5, pady=5)
 
         # Grid principal
         frameGrid = tk.Frame(root)
-        frameGrid.pack(pady=10)
+        frameGrid.pack(pady=10, expand=True, fill='both')
 
-       # Condición
+        # Configurar la expansión de las filas y columnas
+        frameGrid.columnconfigure(0, weight=1)
+        frameGrid.columnconfigure(1, weight=1)
+        frameGrid.columnconfigure(2, weight=1)
+        frameGrid.rowconfigure(0, weight=1)
+
+        # Condición
         frameCondicion = tk.Frame(frameGrid)
-        frameCondicion.grid(row = 0, column = 0, padx = 20)
+        frameCondicion.grid(row=0, column=0, padx=10, sticky='nsew')
 
         condiciones = ["Emétrope", "Miope", "Hipermétrope"]
         condicionSeleccionada = tk.StringVar(root)
@@ -65,17 +75,18 @@ class AplicacionPrincipal:
         menuBotonCondicion["menu"] = menuBotonCondicion.menu
 
         for condicion in condiciones:
-            menuBotonCondicion.menu.add_radiobutton(label = condicion, variable = condicionSeleccionada, value = condicion)
+            menuBotonCondicion.menu.add_radiobutton(label=condicion, variable=condicionSeleccionada, value=condicion)
 
         menuBotonCondicion.pack(pady=5)
 
         # Cuadro gris debajo de "Condicion"
-        imagenOriginal = ImageTk.PhotoImage(Image.new("RGB", (300, 200), "gray"))
-        tk.Label(frameCondicion, image = imagenOriginal).pack()
+        self.imagenOriginal = ImageTk.PhotoImage(Image.new("RGB", (200, 200), "gray"))
+        self.labelImagenOriginal = tk.Label(frameCondicion, image=self.imagenOriginal)
+        self.labelImagenOriginal.pack(expand=True, fill='both')
 
         # Grado
         frameGrado = tk.Frame(frameGrid)
-        frameGrado.grid(row=0, column=1, padx=20)
+        frameGrado.grid(row=0, column=1, padx=20, sticky='nsew')
 
         grados = ["Grado 1", "Grado 2", "Grado 3"]
         gradoSeleccionado = tk.StringVar(root)
@@ -86,18 +97,17 @@ class AplicacionPrincipal:
         menuBotonGrado["menu"] = menuBotonGrado.menu
 
         for grado in grados:
-            menuBotonGrado.menu.add_radiobutton(label = grado, variable = gradoSeleccionado, value = grado)
+            menuBotonGrado.menu.add_radiobutton(label=grado, variable=gradoSeleccionado, value=grado)
 
         menuBotonGrado.pack(pady=5)
 
         # Cuadro gris debajo de "Grado"
-        marchaDeRayos = ImageTk.PhotoImage(Image.new("RGB", (300, 200), "gray"))
-        tk.Label(frameGrado, image = marchaDeRayos).pack()
+        self.marchaDeRayos = ImageTk.PhotoImage(Image.new("RGB", (300, 200), "gray"))
+        tk.Label(frameGrado, image=self.marchaDeRayos).pack(expand=True, fill='both')
 
         # Distancia
         frameDistancia = tk.Frame(frameGrid)
-        frameDistancia.grid(row=0, column=2, padx=10)
-        #tk.Label(frame_distancia, text="Distancia", bg="#3b82f6", fg="white", padx=10, pady=5).pack()
+        frameDistancia.grid(row=0, column=2, padx=10, sticky='nsew')
 
         distancias = ["Punto lejano", "Punto cercano", "Punto medio"]
         distanciaSeleccionada = tk.StringVar(root)
@@ -108,24 +118,37 @@ class AplicacionPrincipal:
         menuBotonDistancia["menu"] = menuBotonDistancia.menu
 
         for distancia in distancias:
-            menuBotonDistancia.menu.add_radiobutton(label = distancia, variable = distanciaSeleccionada, value = distancia)
+            menuBotonDistancia.menu.add_radiobutton(label=distancia, variable=distanciaSeleccionada, value=distancia)
 
         menuBotonDistancia.pack(pady=5)
 
         # Cuadro gris debajo de "Distancia"
-        imagenEnElCerebro = ImageTk.PhotoImage(Image.new("RGB", (200, 200), "gray"))
-        tk.Label(frameDistancia, image = imagenEnElCerebro).pack()
+        self.imagenEnElCerebro = ImageTk.PhotoImage(Image.new("RGB", (200, 200), "gray"))
+        tk.Label(frameDistancia, image=self.imagenEnElCerebro).pack(expand=True, fill='both')
 
         # Información de distancia y botón
-        frameInfo = tk.Frame(root)
-        frameInfo.pack(pady=10, anchor='w')  # Align to the left
-
-        tk.Label(frameInfo, text="Punto Remoto:").pack(anchor='w')
-        tk.Label(frameInfo, text="Punto Lejano:").pack(anchor='w')
-        tk.Label(frameInfo, text="Lente correctora:").pack(anchor='w')
-            
+        frameInfo = tk.Frame(root, bd=2, relief=tk.SUNKEN, padx=35, pady=15, bg="#e0e0e0")
+        frameInfo.pack(padx=10, pady=5, anchor='w')  # Align to the left
         
+        # Aumentar el tamaño de la fuente predeterminada
+        #default_font = tkFont.nametofont("TkDefaultFont")
+        #default_font.configure(size=16)
+        
+        tk.Label(frameInfo, text="Punto Remoto:", bg="#e0e0e0").pack(anchor='w')
+        tk.Label(frameInfo, text="Punto Lejano:", bg="#e0e0e0").pack(anchor='w')
+        tk.Label(frameInfo, text="Lente correctora:", bg="#e0e0e0").pack(anchor='w')
 
+    def mostrar_imagen(self, index):
+        if index < len(directoriosImagenes):
+            print(f"Mostrando imagen {index}")
+            imagen_path = "\\RepositorioTIF\\Software\\TrabajoIntegradorFinal_Fisio\\imagenes_nuevas\\" + directoriosImagenes[index]
+            print(f"Ruta de la imagen: {imagen_path}")
+            imagen = gImagen.mostrar_imagen(imagen_path)
+            imagen = imagen.resize((200, 200))
+            self.imagenOriginal = ImageTk.PhotoImage(imagen)
+            self.labelImagenOriginal.config(image=self.imagenOriginal)
+            self.labelImagenOriginal.image = self.imagenOriginal
+            
 def ejecutar_gui():
     root = tk.Tk()
     app = AplicacionPrincipal(root)

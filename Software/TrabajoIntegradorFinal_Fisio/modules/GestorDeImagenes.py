@@ -4,18 +4,25 @@ import os
 import numpy as np
 
 class gestorDeImagenes:
-    """Clase para mostrar imágenes en una nueva ventana."""
-    def __init__(self, directorio):
-        self.directorio = directorio
-        self.imagenes = []
-        self.image_array = []
-        self.cargar_imagenes()
+    """Clase para mostrar imágenes."""
+    def __init__(self, nombre):
+        self.nombre = nombre
 
+    def setDirectorio(self, directorio):
+        self.directorio = directorio
+        self.cargar_imagenes()
+    
     def cargar_imagenes(self):
         """Carga las imágenes del directorio especificado."""
+        self.imagenes = []  # Limpiar la lista de imágenes antes de cargar nuevas
         for archivo in os.listdir(self.directorio):
             if archivo.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.bmp')):
                 self.imagenes.append(os.path.join(self.directorio, archivo))
+
+    def mostrar_imagen(self, imagen_path):
+        """Carga y devuelve una imagen específica."""
+        img = Image.open(imagen_path)
+        return img
 
     def mostrar_imagenes(self):
         """Muestra las imágenes en una nueva ventana."""
