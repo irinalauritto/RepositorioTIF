@@ -17,13 +17,28 @@ class Hipermetropia(VicioDeRefraccion):
     
     # Funciones de la clase
    
-    def calcularLenteCorrectora(self):
+    def definirLenteCorrectora(self): #Definimos 1,3, y 6 a los grados leve, moderado y severos, rspectivamente.
+       
+        if self.grado == 1:
+            self.dioptriasLenteCorrectora = 1.00
+        elif self.grado == 3:
+            self.dioptriasLenteCorrectora = 3.00
+        elif self.grado == 6:
+            self.dioptriasLenteCorrectora = 6.00
+    
+    def calcularPuntoCercano(self): ##Las dioptrias del lente para hipermetropia son positivas.
         """
-        Calculates the corrective lens.
+        Calculates the near point.
 
+        Returns:
+            float: near point.
         """
-        pass
-
+        return 1/((1/0.25)-self.dioptriasLenteCorrectora) #chequear
+    
+    def calcularPuntoLejano(self): ##Las dioptrias del lente para hipermetropia son positivas.
+   
+        return 1/((1/10)-self.dioptriasLenteCorrectora) #chequear
+   
     def modificarImagen(self, grado):
         """
         Modifies the image according to the degree of the pathology.

@@ -25,7 +25,9 @@ def propagar_rayo(y_inicial, theta_inicial, M_total):
 # Generar gráfico y guardarlo como archivo temporal
 def generar_grafico(distancia_espacio, distancia_focal, distancia_retina, altura_objeto, angulo_inicial):
     M_total = sistema_optico(distancia_espacio, distancia_focal, distancia_retina)
-    y_vals = np.linspace(-altura_objeto, altura_objeto, 5)
+    
+    # Solo dos rayos: el perpendicular y el que pasa por el foco
+    y_vals = [0, distancia_focal]
     rayos = [propagar_rayo(y, angulo_inicial, M_total) for y in y_vals]
 
     # Crear gráfico

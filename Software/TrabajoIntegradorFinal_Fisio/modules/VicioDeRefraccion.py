@@ -25,6 +25,9 @@ class VicioDeRefraccion:
     def getDioptriasLenteCorrectora(self):
         return self.dioptriasLenteCorrectora
     
+    def setDioptriasLenteCorrectora(self):
+        self.dioptriasLenteCorrectora = dioptriasLenteCorrector
+    
     def calcularLenteCorrectora():
         """
         Calcula la lente correctora.
