@@ -12,83 +12,119 @@ class AplicacionPrincipal:
     def __init__(self, root):
         self.root = root
         self.root.title("Simulador del ojo humano")
-        self.root.geometry("600x600")
-        self.root.configure(bg='lightblue')  # Set background color to light blue
+        self.root.geometry("900x500")
+        
+        #crear la barra de tareas
+        self.frameBarraTareas = tk.Frame(self.root)
+        self.frameBarraTareas.pack(fill='x')
 
-        self.label_directorio = tk.Label(self.root, text="Directorio no seleccionado", anchor="w", highlightbackground="gray", highlightthickness=1, bg='lightblue')
-        self.label_directorio.pack(fill="x", padx=10, pady=5)
+        #Botón para seleccionar imágenes
+        directoriosImagenes = gArchivos.extraeListadoDeArchivos("Imagenes")
+        imagenes = ["imagen 1", "imagen 2", "imagen 3", "imagen 4", "imagen 5"]
+        imagenSeleccionada = tk.StringVar(root)
+        imagenSeleccionada.set("Seleccionar imagen")
 
-        self.directorios_preestablecidos = ["\\RepositorioTIF\\Software\\TrabajoIntegradorFinal_Fisio\\imagenes", "\\RepositorioTIF\\Software\\TrabajoIntegradorFinal_Fisio\\imagenes_guardadas"]
-        self.directorio_seleccionado = tk.StringVar(self.root)
-        self.directorio_seleccionado.set(self.directorios_preestablecidos[0])  # Set default value
+        menu_button_imagen = tk.Menubutton(self.frameBarraTareas, text="Seleccionar Imagen", relief=tk.FLAT, bg='gray')
+        menu_button_imagen.menu = tk.Menu(menu_button_imagen, tearoff=0)
+        menu_button_imagen["menu"] = menu_button_imagen.menu
+         
 
-        self.menu_directorios = tk.OptionMenu(self.root, self.directorio_seleccionado, *self.directorios_preestablecidos)
-        self.menu_directorios.config(bg='lightblue')
-        self.menu_directorios.pack(pady=5)
+        for imagen in imagenes:
+            menu_button_imagen.menu.add_radiobutton(label = imagen, variable = imagenSeleccionada, value = imagen)
 
-        self.boton_seleccionar = tk.Button(self.root, text="Seleccionar Directorio", command=self.seleccionar_directorio, bg='lightblue')
-        self.boton_seleccionar.pack(pady=5)
+        menu_button_imagen.pack(side='left', padx=5, pady=5)
+        
+        print(imagenSeleccionada)
 
-        self.listbox_archivos = tk.Listbox(self.root, width=60, height=20)
-        self.listbox_archivos.pack(padx=10, pady=5)
+        # Botón "Preguntas"
+        preguntasBoton = tk.Button(self.frameBarraTareas, text="Preguntas", command=lambda: messagebox.showinfo("Preguntas", "Aquí van las preguntas."),relief=tk.FLAT, bg='gray')
+        preguntasBoton.pack(side='left', padx=5, pady=5)
 
-        self.boton_refrescar = tk.Button(self.root, text="Actualizar", command=self.actualizar_listado, bg='lightblue')
-        self.boton_refrescar.pack(pady=5)
+        # Botón "Ayuda"
+        ayudaBoton = tk.Button(self.frameBarraTareas, text="Ayuda", command=lambda: messagebox.showinfo("Ayuda", "Aquí va la ayuda."), relief=tk.FLAT, bg='gray')
+        ayudaBoton.pack(side='left', padx=5, pady=5)
 
-        self.boton_mostrar_imagenes = tk.Button(self.root, text="Mostrar Imágenes", command=self.mostrar_imagenes, bg='lightblue')
-        self.boton_mostrar_imagenes.pack(pady=5)
+        # Botón "Imágenes de Prueba"
+        ImagenesPruebaBoton = tk.Button(self.frameBarraTareas, text="Imágenes de Prueba", command=lambda: messagebox.showinfo("Imágenes de Prueba", "Aquí van las imágenes de prueba."), relief=tk.FLAT, bg='gray')
+        ImagenesPruebaBoton.pack(side='left', padx=5, pady=5)
 
-        self.boton_mostrar_imagen = tk.Button(self.root, text="Mostrar Imagen Seleccionada", command=self.mostrar_imagen_seleccionada, bg='lightblue')
-        self.boton_mostrar_imagen.pack(pady=5)
+        # Grid principal
+        frameGrid = tk.Frame(root)
+        frameGrid.pack(pady=10)
 
-        self.directorio = None
+       # Condición
+        frameCondicion = tk.Frame(frameGrid)
+        frameCondicion.grid(row = 0, column = 0, padx = 20)
 
-    def seleccionar_directorio(self):
-        self.directorio = self.directorio_seleccionado.get()
-        print(self.directorio)
-        if self.directorio:
-            self.label_directorio.config(text=f"Directorio: {self.directorio}")
-            gArchivos.extraeListadoDeArchivos(self.directorio)
-            self.actualizar_listado()
-        else:
-            messagebox.showinfo("Información", "No se seleccionó ningún directorio.")
+        condiciones = ["Emétrope", "Miope", "Hipermétrope"]
+        condicionSeleccionada = tk.StringVar(root)
+        condicionSeleccionada.set("Seleccione Condicion")
 
-    def actualizar_listado(self):
-        self.listbox_archivos.delete(0, tk.END)
-        try:
-            for archivo in gArchivos.listado_de_archivos:
-                if archivo not in [".", ".."]:
-                    self.listbox_archivos.insert(tk.END, archivo)
-        except Exception as e:
-            messagebox.showerror("Error", f"Error al leer el directorio: {e}")
+        menuBotonCondicion = tk.Menubutton(frameCondicion, text="Condición", relief=tk.FLAT, bg="#3b82f6", fg="white")
+        menuBotonCondicion.menu = tk.Menu(menuBotonCondicion, tearoff=0)
+        menuBotonCondicion["menu"] = menuBotonCondicion.menu
 
-    def mostrar_imagenes(self):
-        if self.directorio:
-            gestor_imagenes = gi.GestorDeImagenes(self.directorio)
-            gestor_imagenes.mostrar_imagenes()
-        else:
-            messagebox.showinfo("Información", "No se ha seleccionado ningún directorio.")
+        for condicion in condiciones:
+            menuBotonCondicion.menu.add_radiobutton(label = condicion, variable = condicionSeleccionada, value = condicion)
 
-    def mostrar_imagen_seleccionada(self):
-        seleccion = self.listbox_archivos.curselection()
-        if seleccion:
-            archivo_seleccionado = self.listbox_archivos.get(seleccion)
-            ruta_imagen = f"{self.directorio}/{archivo_seleccionado}"
-            self.mostrar_imagen(ruta_imagen)
-        else:
-            messagebox.showinfo("Información", "No se ha seleccionado ningún archivo.")
+        menuBotonCondicion.pack(pady=5)
 
-    def mostrar_imagen(self, ruta_imagen):
-        ventana_imagen = tk.Toplevel(self.root)
-        ventana_imagen.title("Imagen Seleccionada")
+        # Cuadro gris debajo de "Condicion"
+        imagenOriginal = ImageTk.PhotoImage(Image.new("RGB", (300, 200), "gray"))
+        tk.Label(frameCondicion, image = imagenOriginal).pack()
 
-        img = Image.open(ruta_imagen)
-        img = img.resize((400, 400))
-        img_tk = ImageTk.PhotoImage(img)
+        # Grado
+        frameGrado = tk.Frame(frameGrid)
+        frameGrado.grid(row=0, column=1, padx=20)
 
-        label = tk.Label(ventana_imagen, image=img_tk)
-        label.image = img_tk  # Keep a reference to avoid garbage collection
-        label.pack()
+        grados = ["Grado 1", "Grado 2", "Grado 3"]
+        gradoSeleccionado = tk.StringVar(root)
+        gradoSeleccionado.set("Seleccione Grado")
+
+        menuBotonGrado = tk.Menubutton(frameGrado, text="Grado", relief=tk.FLAT, bg="#3b82f6", fg="white")
+        menuBotonGrado.menu = tk.Menu(menuBotonGrado, tearoff=0)
+        menuBotonGrado["menu"] = menuBotonGrado.menu
+
+        for grado in grados:
+            menuBotonGrado.menu.add_radiobutton(label = grado, variable = gradoSeleccionado, value = grado)
+
+        menuBotonGrado.pack(pady=5)
+
+        # Cuadro gris debajo de "Grado"
+        marchaDeRayos = ImageTk.PhotoImage(Image.new("RGB", (300, 200), "gray"))
+        tk.Label(frameGrado, image = marchaDeRayos).pack()
+
+        # Distancia
+        frameDistancia = tk.Frame(frameGrid)
+        frameDistancia.grid(row=0, column=2, padx=10)
+        #tk.Label(frame_distancia, text="Distancia", bg="#3b82f6", fg="white", padx=10, pady=5).pack()
+
+        distancias = ["Punto lejano", "Punto cercano", "Punto medio"]
+        distanciaSeleccionada = tk.StringVar(root)
+        distanciaSeleccionada.set("Seleccione Distancia")
+
+        menuBotonDistancia = tk.Menubutton(frameDistancia, text="Distancia", relief=tk.FLAT, bg="#3b82f6", fg="white")
+        menuBotonDistancia.menu = tk.Menu(menuBotonDistancia, tearoff=0)
+        menuBotonDistancia["menu"] = menuBotonDistancia.menu
+
+        for distancia in distancias:
+            menuBotonDistancia.menu.add_radiobutton(label = distancia, variable = distanciaSeleccionada, value = distancia)
+
+        menuBotonDistancia.pack(pady=5)
+
+        # Cuadro gris debajo de "Distancia"
+        imagenEnElCerebro = ImageTk.PhotoImage(Image.new("RGB", (200, 200), "gray"))
+        tk.Label(frameDistancia, image = imagenEnElCerebro).pack()
+
+        # Información de distancia y botón
+        frameInfo = tk.Frame(root)
+        frameInfo.pack(pady=10, anchor='w')  # Align to the left
+
+        tk.Label(frameInfo, text="Punto Remoto:").pack(anchor='w')
+        tk.Label(frameInfo, text="Punto Lejano:").pack(anchor='w')
+        tk.Label(frameInfo, text="Lente correctora:").pack(anchor='w')
+            
+        
 
 def ejecutar_gui():
     root = tk.Tk()
