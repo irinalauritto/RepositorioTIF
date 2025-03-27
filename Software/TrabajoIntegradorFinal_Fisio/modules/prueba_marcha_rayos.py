@@ -1,3 +1,4 @@
+"""
 import numpy as np
 import flet as ft
 import matplotlib.pyplot as plt
@@ -138,3 +139,67 @@ def main(page: ft.Page):
         img.update()
 
 ft.app(target=main)
+"""
+
+# Ejemplo de simulación de óptica geométrica con Tkinter
+import numpy as np  # Para cálculos matemáticos
+import matplotlib.pyplot as plt  # Para generar gráficos
+from matplotlib.widgets import Slider  # Para widgets interactivos en gráficos
+import tkinter as tk  # Para crear la interfaz gráfica
+from tkinter import ttk  # Para widgets avanzados de Tkinter
+import matplotlib.backends.backend_tkagg as tkagg  # Para integrar gráficos de Matplotlib en Tkinter
+
+# Dibuja la simulación óptica en el gráfico
+def draw_optical_sim(focal_length, object_distance, ax):
+    ax.clear()  # Limpia el gráfico actual
+    ax.set_xlim(-400, 400)  # Establece los límites del eje X
+    ax.set_ylim(-150, 150)  # Establece los límites del eje Y
+    ax.axvline(x=0, color='blue', linestyle='--', label='Lente')  # Dibuja la lente
+    ax.axhline(y=0, color='black', linewidth=1)  # Dibuja el eje óptico
+
+    ax.plot([-object_distance, -object_distance], [0, 50], 'k-', linewidth=3, label='Objeto')  # Dibuja el objeto
+
+    if focal_length != object_distance:  # Calcula y dibuja la imagen si es posible
+        try:
+            image_distance = 1 / (1 / focal_length - 1 / object_distance)  # Calcula la distancia de la imagen
+            image_height = -50 * (image_distance / object_distance)  # Calcula la altura de la imagen
+            ax.plot([image_distance, image_distance], [0, image_height], 'r-', linewidth=3, label='Imagen')  # Dibuja la imagen
+        except ZeroDivisionError:
+            pass  # Maneja el caso en que la distancia del objeto sea igual a la distancia focal
+
+    ax.legend()  # Muestra la leyenda
+    ax.figure.canvas.draw()  # Actualiza el gráfico
+
+# Actualiza la simulación con los valores de los sliders
+def update_sim(slider_focal, slider_object, ax):
+    focal_length = slider_focal.get()  # Obtiene el valor del slider de longitud focal
+    object_distance = slider_object.get()  # Obtiene el valor del slider de distancia del objeto
+    draw_optical_sim(focal_length, object_distance, ax)  # Redibuja la simulación
+
+# Crea la interfaz gráfica con Tkinter
+def tkinter_gui():
+    root = tk.Tk()  # Crea la ventana principal
+    root.title("Simulación de Óptica Geométrica")  # Establece el título de la ventana
+
+    frame = ttk.Frame(root, padding=10)  # Crea un marco para organizar los widgets
+    frame.grid(row=0, column=0)  # Posiciona el marco en la cuadrícula
+
+    fig, ax = plt.subplots()  # Crea un gráfico de Matplotlib
+    canvas = tkagg.FigureCanvasTkAgg(fig, master=frame)  # Integra el gráfico en Tkinter
+    canvas.get_tk_widget().grid(row=0, column=0, columnspan=2)  # Posiciona el gráfico en la cuadrícula
+
+    slider_focal = tk.Scale(frame, from_=50, to=200, resolution=10, orient='horizontal', label='Focal Length')  # Slider para longitud focal
+    slider_focal.set(100)  # Valor inicial del slider
+    slider_focal.grid(row=1, column=0)  # Posiciona el slider en la cuadrícula
+
+    slider_object = tk.Scale(frame, from_=50, to=300, resolution=10, orient='horizontal', label='Object Distance')  # Slider para distancia del objeto
+    slider_object.set(150)  # Valor inicial del slider
+    slider_object.grid(row=1, column=1)  # Posiciona el slider en la cuadrícula
+
+    update_button = ttk.Button(frame, text="Actualizar", command=lambda: update_sim(slider_focal, slider_object, ax))  # Botón para actualizar la simulación
+    update_button.grid(row=2, column=0, columnspan=2)  # Posiciona el botón en la cuadrícula
+
+    draw_optical_sim(100, 150, ax)  # Dibuja la simulación inicial
+    root.mainloop()  # Inicia el bucle principal de la interfaz gráfica
+
+tkinter_gui()  # Ejecuta la interfaz gráfica
