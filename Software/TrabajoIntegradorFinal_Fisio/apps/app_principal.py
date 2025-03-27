@@ -4,11 +4,13 @@ from tkinter import font as tkFont
 from PIL import Image, ImageTk
 import modules.GestorDeArchivos as ga
 import modules.GestorDeImagenes as gi
+import modules.MarchaDeRayos as mr
 
 gArchivos = ga.gestorDeArchivos("Gestor de Archivos")
 gArchivos.extraeListadoDeArchivos("\\RepositorioTIF\\Software\\TrabajoIntegradorFinal_Fisio\\imagenes_nuevas")
 directoriosImagenes = gArchivos.getListadoDeArchivos()
 gImagen = gi.gestorDeImagenes("Gestor de Imagenes")
+mRayos = mr.MarchaDeRayos("Marcha de Rayos", 40, 10, 15, 20, 1000, 0)
 
 # Imprimir los archivos cargados para verificar
 print("Archivos cargados desde el directorio:")
@@ -102,8 +104,10 @@ class AplicacionPrincipal:
         menuBotonGrado.pack(pady=5)
 
         # Cuadro gris debajo de "Grado"
-        self.marchaDeRayos = ImageTk.PhotoImage(Image.new("RGB", (300, 200), "gray"))
-        tk.Label(frameGrado, image=self.marchaDeRayos).pack(expand=True, fill='both')
+        self.marchaDeRayos = mRayos.generarGrafico()
+        self.marchaDeRayos = ImageTk.PhotoImage(Image.open(self.marchaDeRayos))
+        self.labelMarchaDeRayos = tk.Label(frameGrado, image=self.marchaDeRayos)
+        self.labelMarchaDeRayos.pack(expand=True, fill='both')
 
         # Distancia
         frameDistancia = tk.Frame(frameGrid)
@@ -148,7 +152,13 @@ class AplicacionPrincipal:
             self.imagenOriginal = ImageTk.PhotoImage(imagen)
             self.labelImagenOriginal.config(image=self.imagenOriginal)
             self.labelImagenOriginal.image = self.imagenOriginal
-            
+    
+    def mostrarMarchaDeRayos(self):
+        temp_image = mRayos.generarGrafico()
+        self.marchaDeRayos = ImageTk.PhotoImage(Image.open(temp_image))
+        self.labelMarchaDeRayos.config(image=self.marchaDeRayos)
+        self.labelMarchaDeRayos.image = self.marchaDeRayos
+
 def ejecutar_gui():
     root = tk.Tk()
     app = AplicacionPrincipal(root)

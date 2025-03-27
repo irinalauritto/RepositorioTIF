@@ -72,7 +72,7 @@ def main(page: ft.Page):
     distancia_espacio = 10  # mm
     distancia_focal = 15    # mm
     distancia_retina = 20   # mm
-    altura_objeto = 1000       # mm
+    altura_objeto = 250       # mm
     angulo_inicial = 0    # rad
 
     # Imagen inicial
