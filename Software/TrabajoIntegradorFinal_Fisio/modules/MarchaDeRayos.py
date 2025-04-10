@@ -1,92 +1,55 @@
-import numpy as np
-import flet as ft
-import matplotlib.pyplot as plt
-import tempfile
-import os
+import numpy as np  # Para cálculos matemáticos
+import matplotlib.pyplot as plt  # Para generar gráficos
+from matplotlib.widgets import Slider  # Para widgets interactivos en gráficos
+import tkinter as tk  # Para crear la interfaz gráfica
+from tkinter import ttk  # Para widgets avanzados de Tkinter
+import matplotlib.backends.backend_tkagg as tkagg  # Para integrar gráficos de Matplotlib en Tkinter
+
 
 class MarchaDeRayos:
     """Clase para simular la marcha de rayos en un sistema óptico."""
-    def __init__(self, nombre, dioptriasLente, distanciaEspacio, distanciaFocal, distanciaRetina, alturaObjeto, anguloInicial):
+    def __init__(self, nombre, dioptriasLente, distanciaObjeto, distanciaFocal, anguloInicial):
         self.nombre = nombre
         self.dioptriasLente = dioptriasLente
-        self.distanciaEspacio = distanciaEspacio #mm
+        self.ax = None  # Inicializar el eje como None
+        self.distanciaObjeto = distanciaObjeto #mm
         self.distanciaFocal = distanciaFocal #mm
-        self.distanciaRetina = distanciaRetina #mm
-        self.alturaObjeto = alturaObjeto #mm
+        self.distanciaRetina = 25 #mm
         self.anguloInicial = anguloInicial #rad (inicializar en 0)
         self.imagen = None  # Inicializar la imagen como None
     
-    def espacioLibre(self, d):
-        return np.array([[1, d], [0, 1]])
+    def dibujarSimulacion(self, nDistanciaFocal , nDistanciaObjeto ,  ax):
+        ax.clear()  # Limpia el gráfico actual
+        ax.set_xlim(-200, 200)  # Establece los límites del eje X
+        ax.set_ylim(-70, 70)  # Establece los límites del eje Y
+        ax.axvline(x=0, color='blue', linestyle='--', label='Lente')  # Dibuja la lente
+        ax.axhline(y=0, color='black', linewidth=1)  # Dibuja el eje óptico
 
-    def lenteDelgada(self, f):
-        return np.array([[1, 0], [-1 / f, 1]])
+        self.distanciaFocal = nDistanciaFocal  # Actualiza la distancia focal
+        self.distanciaObjeto = nDistanciaObjeto   # Actualiza la distancia del objeto
+
+        ax.plot([-self.distanciaObjeto, -self.distanciaObjeto], [0, 50], 'k-', linewidth=3, label='Objeto')  # Dibuja el objeto
+
+        if self.distanciaFocal != self.distanciaObjeto:  # Calcula y dibuja la imagen si es posible
+            try:
+                self.distanciaImagen = 1 / (1 / self.distanciaFocal - 1 / self.distanciaObjeto)  # Calcula la distancia de la imagen
+                self.alturaImagen = -50 * (self.distanciaImagen / self.distanciaObjeto)  # Calcula la altura de la imagen
+                ax.plot([self.distanciaImagen, self.distanciaImagen], [0, self.alturaImagen], 'r-', linewidth=3, label='Imagen')  # Dibuja la imagen
+            except ZeroDivisionError:
+                pass  # Maneja el caso en que la distancia del objeto sea igual a la distancia focal
+
+        ax.legend()  # Muestra la leyenda
+        ax.figure.canvas.draw()  # Actualiza el gráfico
+
+# Actualiza la simulación con los valores de los sliders
+    def actualizarSimulacion(self, nuevaDistanciaFocal, nuevaDistanciaObjeto, ax):
+        self.distanciaFocal= nuevaDistanciaFocal  # Obtiene el valor del slider de longitud focal
+        self.distanciaObjeto = nuevaDistanciaObjeto  # Obtiene el valor del slider de distancia del objeto
+        self.dibujarSimulacion(self.distanciaFocal,self.distanciaObjeto, ax)  # Redibuja la simulación
     
-    def sistemaOptico(self):
-        M_espacio = self.espacioLibre(self.distanciaEspacio)
-        M_lente = self.lenteDelgada(self.distanciaFocal)
-        M_retina = self.espacioLibre(self.distanciaRetina)
-        return M_retina @ M_lente @ M_espacio
+   
 
-    def propagarRayo(self, yInicial, thetaInicial, M_total):
-        rayoInicial = np.array([yInicial, thetaInicial])
-        rayoFinal = M_total @ rayoInicial
-        return rayoInicial, rayoFinal
-    
-    def generarGrafico(self ):
-        M_total = self.sistemaOptico()
-        
-        # Solo dos rayos: el perpendicular y el que pasa por el foco
-        y_vals = [0, self.distanciaFocal]
-        rayos = [self.propagarRayo(y, self.anguloInicial, M_total) for y in y_vals]
 
-        # Crear gráfico
-        fig, ax = plt.subplots(figsize=(8, 4))
-        ax.axhline(0, color="black", linewidth=0.8)  # Eje óptico
-        ax.axvline(self.distanciaEspacio, color="blue", linewidth=1.5, label="Lente")  # Lente
-        ax.axvline(self.distanciaEspacio + self.distanciaRetina, color="red", linewidth=1.5, label="Retina")  # Retina
-
-        # Dibujar rayos
-        for rayoInicial, rayoFinal in rayos:
-            y1, theta1 = rayoInicial
-            y2, _ = rayoFinal
-
-            # Primera sección (espacio libre)
-            x1, x2 = 0, self.distanciaEspacio
-            ax.plot([x1, x2], [y1, y1 + theta1 * self.distanciaEspacio], color="green")
-
-            # Segunda sección (a través de la lente)
-            y_lente = y1 + theta1 * self.distanciaEspacio
-            theta_lente = theta1 - y_lente / self.distanciaFocal
-            x3, x4 = self.distanciaEspacio, self.distanciaEspacio + self.distanciaRetina
-            ax.plot([x3, x4], [y_lente, y2], color="green")
-
-        # Etiquetas y configuración del gráfico
-        ax.set_title("Simulación de Marcha de Rayos")
-        ax.set_xlabel("Distancia (mm)")
-        ax.set_ylabel("Altura (mm)")
-        ax.legend()
-        ax.grid(True)
-       
-        # Guardar gráfico temporalmente
-        temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".png")
-        plt.savefig(temp_file.name)
-        plt.close(fig)
-        return temp_file.name
-
-       
-    def mostrarImagen(self, tempImage):
-         self.imagen = ft.Image(
-            src=f"/{tempImage}",
-            width=600,
-            height=300
-        )
-         
-   # def actualizarImagen():
-    #    temp_image = generarGrafico()
-     #   img.src = f"/{temp_image}"
-      
-      #  img.update()
     
     def saludo(self):
         """

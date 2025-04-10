@@ -5,12 +5,16 @@ from PIL import Image, ImageTk
 import modules.GestorDeArchivos as ga
 import modules.GestorDeImagenes as gi
 import modules.MarchaDeRayos as mr
+import matplotlib.pyplot as plt  # Para generar gráficos
+import matplotlib.backends.backend_tkagg as tkagg  # Para integrar gráficos de Matplotlib en Tkinter
+
+
 
 gArchivos = ga.gestorDeArchivos("Gestor de Archivos")
 gArchivos.extraeListadoDeArchivos("\\RepositorioTIF\\Software\\TrabajoIntegradorFinal_Fisio\\imagenes_nuevas")
 directoriosImagenes = gArchivos.getListadoDeArchivos()
 gImagen = gi.gestorDeImagenes("Gestor de Imagenes")
-mRayos = mr.MarchaDeRayos("Marcha de Rayos", 40, 10, 15, 20, 1000, 0)
+mRayos = mr.MarchaDeRayos("Marcha de Rayos", 25, 150, 25, 0)
 
 # Imprimir los archivos cargados para verificar
 print("Archivos cargados desde el directorio:")
@@ -55,24 +59,24 @@ class AplicacionPrincipal:
         ImagenesPruebaBoton.pack(side='left', padx=5, pady=5)
 
         # Grid principal
-        frameGrid = tk.Frame(root)
-        frameGrid.pack(pady=10, expand=True, fill='both')
+        self.frameGrid = tk.Frame(root)
+        self.frameGrid.pack(pady=10, expand=True, fill='both')
 
         # Configurar la expansión de las filas y columnas
-        frameGrid.columnconfigure(0, weight=1)
-        frameGrid.columnconfigure(1, weight=1)
-        frameGrid.columnconfigure(2, weight=1)
-        frameGrid.rowconfigure(0, weight=1)
+        self.frameGrid.columnconfigure(0, weight=1)
+        self.frameGrid.columnconfigure(1, weight=1)
+        self.frameGrid.columnconfigure(2, weight=1)
+        self.frameGrid.rowconfigure(0, weight=1)
 
         # Condición
-        frameCondicion = tk.Frame(frameGrid)
-        frameCondicion.grid(row=0, column=0, padx=10, sticky='nsew')
+        self.frameCondicion = tk.Frame(self.frameGrid)
+        self.frameCondicion.grid(row=0, column=0, padx=10, sticky='nsew')
 
         condiciones = ["Emétrope", "Miope", "Hipermétrope"]
         condicionSeleccionada = tk.StringVar(root)
         condicionSeleccionada.set("Seleccione Condicion")
 
-        menuBotonCondicion = tk.Menubutton(frameCondicion, text="Condición", relief=tk.FLAT, bg="#3b82f6", fg="white")
+        menuBotonCondicion = tk.Menubutton(self.frameCondicion, text="Condición", relief=tk.FLAT, bg="#3b82f6", fg="white")
         menuBotonCondicion.menu = tk.Menu(menuBotonCondicion, tearoff=0)
         menuBotonCondicion["menu"] = menuBotonCondicion.menu
 
@@ -83,65 +87,69 @@ class AplicacionPrincipal:
 
         # Cuadro gris debajo de "Condicion"
         self.imagenOriginal = ImageTk.PhotoImage(Image.new("RGB", (200, 200), "gray"))
-        self.labelImagenOriginal = tk.Label(frameCondicion, image=self.imagenOriginal)
+        self.labelImagenOriginal = tk.Label(self.frameCondicion, image=self.imagenOriginal)
         self.labelImagenOriginal.pack(expand=True, fill='both')
 
         # Grado
-        frameGrado = tk.Frame(frameGrid)
-        frameGrado.grid(row=0, column=1, padx=20, sticky='nsew')
+        self.frameGrado = tk.Frame(self.frameGrid)
+        self.frameGrado.grid(row=0, column=1, padx=20, sticky='nsew')
 
         grados = ["Grado 1", "Grado 2", "Grado 3"]
         gradoSeleccionado = tk.StringVar(root)
         gradoSeleccionado.set("Seleccione Grado")
 
-        menuBotonGrado = tk.Menubutton(frameGrado, text="Grado", relief=tk.FLAT, bg="#3b82f6", fg="white")
+        menuBotonGrado = tk.Menubutton(self.frameGrado, text="Grado", relief=tk.FLAT, bg="#3b82f6", fg="white")
         menuBotonGrado.menu = tk.Menu(menuBotonGrado, tearoff=0)
         menuBotonGrado["menu"] = menuBotonGrado.menu
 
         for grado in grados:
             menuBotonGrado.menu.add_radiobutton(label=grado, variable=gradoSeleccionado, value=grado)
 
-        menuBotonGrado.pack(pady=5)
+        menuBotonGrado.pack(pady=1)
+        fig, ax = plt.subplots(figsize=(4, 2))  # Ajusta el tamaño del gráfico con figsize
+        canvas = tkagg.FigureCanvasTkAgg(fig, master=self.frameGrado)  # Integra el gráfico en Tkinter
 
-        # Cuadro gris debajo de "Grado"
-        self.marchaDeRayos = mRayos.generarGrafico()
-        self.marchaDeRayos = ImageTk.PhotoImage(Image.open(self.marchaDeRayos))
-        self.labelMarchaDeRayos = tk.Label(frameGrado, image=self.marchaDeRayos)
-        self.labelMarchaDeRayos.pack(expand=True, fill='both')
+        # Usa grid para posicionar el canvas
+        canvas.get_tk_widget().pack(pady = 50)  # Posiciona el gráfico en la cuadrícula
+
+        # Configurar el tamaño del frame para que se ajuste al gráfico
+        #self.frameGrado.rowconfigure(0, weight=1)
+        #self.frameGrado.columnconfigure(0, weight=1)
+
+        # Dibujar la simulación inicial
+        mRayos.dibujarSimulacion(25, 150, ax)  # Dibuja la simulación inicial
+        #canvas.draw()
 
         # Distancia
-        frameDistancia = tk.Frame(frameGrid)
-        frameDistancia.grid(row=0, column=2, padx=10, sticky='nsew')
+        self.frameDistancia = tk.Frame(self.frameGrid)
+        self.frameDistancia.grid(row=0, column=2, padx=10, sticky='nsew')
 
         distancias = ["Punto lejano", "Punto cercano", "Punto medio"]
-        distanciaSeleccionada = tk.StringVar(root)
-        distanciaSeleccionada.set("Seleccione Distancia")
+        self.distanciaSeleccionada = tk.StringVar(root)
+        self.distanciaSeleccionada.set("Seleccione Distancia")
 
-        menuBotonDistancia = tk.Menubutton(frameDistancia, text="Distancia", relief=tk.FLAT, bg="#3b82f6", fg="white")
+        menuBotonDistancia = tk.Menubutton(self.frameDistancia, text="Distancia", relief=tk.FLAT, bg="#3b82f6", fg="white")
         menuBotonDistancia.menu = tk.Menu(menuBotonDistancia, tearoff=0)
         menuBotonDistancia["menu"] = menuBotonDistancia.menu
 
         for distancia in distancias:
-            menuBotonDistancia.menu.add_radiobutton(label=distancia, variable=distanciaSeleccionada, value=distancia)
+            menuBotonDistancia.menu.add_radiobutton(label=distancia, variable=self.distanciaSeleccionada, value=distancia)
 
         menuBotonDistancia.pack(pady=5)
 
         # Cuadro gris debajo de "Distancia"
         self.imagenEnElCerebro = ImageTk.PhotoImage(Image.new("RGB", (200, 200), "gray"))
-        tk.Label(frameDistancia, image=self.imagenEnElCerebro).pack(expand=True, fill='both')
-
+        tk.Label(self.frameDistancia, image=self.imagenEnElCerebro).pack(expand=True, fill='both')
         # Información de distancia y botón
         frameInfo = tk.Frame(root, bd=2, relief=tk.SUNKEN, padx=35, pady=15, bg="#e0e0e0")
         frameInfo.pack(padx=10, pady=5, anchor='w')  # Align to the left
         
-        # Aumentar el tamaño de la fuente predeterminada
-        #default_font = tkFont.nametofont("TkDefaultFont")
-        #default_font.configure(size=16)
         
         tk.Label(frameInfo, text="Punto Remoto:", bg="#e0e0e0").pack(anchor='w')
         tk.Label(frameInfo, text="Punto Lejano:", bg="#e0e0e0").pack(anchor='w')
         tk.Label(frameInfo, text="Lente correctora:", bg="#e0e0e0").pack(anchor='w')
 
+    
     def mostrar_imagen(self, index):
         if index < len(directoriosImagenes):
             print(f"Mostrando imagen {index}")
@@ -152,12 +160,6 @@ class AplicacionPrincipal:
             self.imagenOriginal = ImageTk.PhotoImage(imagen)
             self.labelImagenOriginal.config(image=self.imagenOriginal)
             self.labelImagenOriginal.image = self.imagenOriginal
-    
-    def mostrarMarchaDeRayos(self):
-        temp_image = mRayos.generarGrafico()
-        self.marchaDeRayos = ImageTk.PhotoImage(Image.open(temp_image))
-        self.labelMarchaDeRayos.config(image=self.marchaDeRayos)
-        self.labelMarchaDeRayos.image = self.marchaDeRayos
 
 def ejecutar_gui():
     root = tk.Tk()
