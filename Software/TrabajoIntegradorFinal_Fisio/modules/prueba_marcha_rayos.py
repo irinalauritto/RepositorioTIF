@@ -318,13 +318,22 @@ from matplotlib.patches import Ellipse
 altura_objeto = 170
 focal_length = 100
 infinito = focal_length*2000
-punto_proximo = 25  # cm
-punto_lejano = 1000 # cm
 condicion = ['Emetrope', 'Miope', 'Hipermetrope']
+condicion_seleccionada = 2 # 0 emetrope, 1 miope, 2 hipermetrope
 distance_values = [5, 10, 15, 20, 25, 30, 100, 300, 500, 700, 1000, 1500] # cm
 
 # Dibuja la simulación óptica en el gráfico
 def draw_optical_sim(object_distance, ax):
+    
+    if condicion_seleccionada == 0: # Si es emetrope
+        punto_proximo = 25  # cm
+        punto_lejano = 1000 # cm
+    elif condicion_seleccionada == 1: # Si es miope
+        punto_proximo = 5  # cm
+        punto_lejano = 1000 # cm
+    elif condicion_seleccionada == 2: # Si es hipermetrope
+        punto_proximo = 1000 # cm
+        punto_lejano = 1500 # cm
     
     image_distance = 300    # Distancia a la retina, lugar donde siempre se forma la imagen
     min_object_distance = punto_proximo # Distancia de objeto asociada con el punto cercano
