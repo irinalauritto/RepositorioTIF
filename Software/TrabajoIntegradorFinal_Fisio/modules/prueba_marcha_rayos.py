@@ -321,12 +321,14 @@ infinito = focal_length*2000
 punto_proximo = 25  # cm
 punto_lejano = 1000 # cm
 condicion = ['Emetrope', 'Miope', 'Hipermetrope']
+distance_values = [5, 10, 15, 20, 25, 30, 100, 300, 500, 700, 1000, 1500] # cm
 
 # Dibuja la simulación óptica en el gráfico
 def draw_optical_sim(object_distance, ax):
     
     image_distance = 300    # Distancia a la retina, lugar donde siempre se forma la imagen
     min_object_distance = punto_proximo # Distancia de objeto asociada con el punto cercano
+    max_object_distance = punto_lejano  # Distancia de objeto asociada con el punto lejano
 
     ax.clear()  # Limpia el gráfico actual
     ax.set_xlim(-1500, 1500)  # Establece los límites del eje X
@@ -353,14 +355,15 @@ def draw_optical_sim(object_distance, ax):
     # Dibuja el objeto
     ax.plot([-object_distance, -object_distance], [0, altura_objeto], 'k-', linewidth=3, label='Objeto')
 
-    # Como la imagen siempre se formará en la retina la incognita es el punto focal
+    # Dentro de los puntos limite la imagen siempre se formará en la retina la incognita es el punto focal
     # Calculo el punto focal
-
-    if object_distance > min_object_distance:                     # Si se encuentra entre el pto lejano y proximo
+    if min_object_distance <= object_distance and object_distance <= max_object_distance: # Si se encuentra entre el pto lejano y proximo
         focal_length = 1/(1/object_distance+1/image_distance)     # El ojo ajusta su potencia para ubicar la imagen en la retina (acomodacion)
-    else:                                                         # Sino
+    if object_distance < min_object_distance:                      # Si el objeto esta dentro del punto proximo
         focal_length = 1/(1/min_object_distance+1/image_distance) # La potencia del ojo es la maxima que puede lograr (correspondida a la distancia minima a la que puede ver claramente un objeto)
-
+    if  max_object_distance < object_distance:                     # Si el objeto esta mas alla del punto lejano
+        focal_length = 1/(1/max_object_distance+1/image_distance) # La potencia del ojo es la minima que puede lograr (correspondida a la distancia maxima a la que puede ver claramente un objeto)
+    
     # Imagen real
     if focal_length < object_distance:  # Calcula y dibuja la imagen si es posible
         image_distance = 1 / (1 / focal_length - 1 / object_distance)  # Calcula la distancia de la imagen
@@ -396,8 +399,10 @@ def draw_optical_sim(object_distance, ax):
     ax.figure.canvas.draw()  # Actualiza el gráfico
 
 # Actualiza la simulación con los valores de los sliders
-def update_sim(slider_object, ax):
-    object_distance = slider_object.get()  # Obtiene el valor del slider de distancia del objeto
+def update_sim(slider_object, slider_value, ax):
+    index = slider_object.get()  # Obtiene el índice del slider
+    object_distance = distance_values[index]  # Obtiene el valor real de distance_values
+    slider_value.set(f"Distancia objeto: {object_distance} cm")  # Actualiza la etiqueta del slider
     draw_optical_sim(object_distance, ax)  # Redibuja la simulación
 
 # Crea la interfaz gráfica con Tkinter
@@ -418,19 +423,30 @@ def tkinter_gui():
     canvas = tkagg.FigureCanvasTkAgg(fig, master=frame)  # Integra el gráfico en Tkinter
     canvas.get_tk_widget().grid(row=0, column=0, columnspan=2, sticky="nsew")  # Permite que el gráfico se expanda
 
+    # Variable para mostrar el valor actual del slider
+    slider_value = tk.StringVar()
+    slider_value.set(f"{distance_values[8]} cm")  # Valor inicial
+    # Etiqueta para mostrar el valor actual del slider
+    label = ttk.Label(frame, textvariable=slider_value)
+    label.grid(row=2, column=0, columnspan=2, sticky="ew")
+
     # Configura sliders para que se ajusten al tamaño de la ventana
-    slider_object = tk.Scale(frame, from_=5, to=1500, resolution=5, orient='horizontal', label='Distancia objeto')
-    slider_object.set(150)
+    slider_object = tk.Scale(
+        frame, from_=0, to=len(distance_values)-1, 
+        orient='horizontal', label='Distancia del objeto: ', 
+        showvalue=False
+    )
+    slider_object.set(8)  # Establece el valor inicial del slider
     slider_object.grid(row=1, column=0, sticky="ew")  # Expande horizontalmente
 
-    update_button = ttk.Button(frame, text="Actualizar", command=lambda: update_sim(slider_object, ax))
-    update_button.grid(row=2, column=0, columnspan=2, sticky="ew")  # Expande horizontalmente
+    update_button = ttk.Button(frame, text="Actualizar", command=lambda: update_sim(slider_object, slider_value, ax))
+    update_button.grid(row=3, column=0, columnspan=2, sticky="ew")  # Expande horizontalmente
 
     # Configura el gráfico para que se ajuste al tamaño de la ventana
     frame.rowconfigure(0, weight=1)  # Permite que el gráfico se expanda verticalmente
     frame.columnconfigure(0, weight=1)  # Permite que el gráfico se expanda horizontalmente
 
-    draw_optical_sim(150, ax)  # Dibuja la simulación inicial
+    draw_optical_sim(distance_values[8], ax)  # Dibuja la simulación inicial
     root.mainloop()  # Inicia el bucle principal de la interfaz gráfica
 
 tkinter_gui()  # Ejecuta la interfaz gráfica
