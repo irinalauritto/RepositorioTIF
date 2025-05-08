@@ -14,7 +14,7 @@ gArchivos = ga.gestorDeArchivos("Gestor de Archivos")
 gArchivos.extraeListadoDeArchivos("\\RepositorioTIF\\Software\\TrabajoIntegradorFinal_Fisio\\imagenes_nuevas")
 directoriosImagenes = gArchivos.getListadoDeArchivos()
 gImagen = gi.gestorDeImagenes("Gestor de Imagenes")
-mRayos = mr.MarchaDeRayos("Marcha de Rayos", 25, 150, 25, 0)
+mRayos = mr.MarchaDeRayos("Marcha de Rayos", 250, 25, 1000)
 
 # Imprimir los archivos cargados para verificar
 print("Archivos cargados desde el directorio:")
@@ -26,14 +26,14 @@ class AplicacionPrincipal:
     def __init__(self, root):
         self.root = root
         self.root.title("Simulador del ojo humano")
-        self.root.geometry("900x500")
-        
+        self.root.state('zoomed')  # Pantalla completa
+
         # Crear la barra de tareas
         self.frameBarraTareas = tk.Frame(self.root)
         self.frameBarraTareas.pack(fill='x')
 
         # Botón para seleccionar imágenes
-        imagenes = ["Arbol", "Corazón", "Estrella colorida", "Estrella", "Flecha"]
+        imagenes = ["Arbol", "Vela"]
         self.imagenSeleccionada = tk.StringVar(root)
         self.imagenSeleccionada.set("Seleccionar imagen")
 
@@ -106,18 +106,16 @@ class AplicacionPrincipal:
             menuBotonGrado.menu.add_radiobutton(label=grado, variable=gradoSeleccionado, value=grado)
 
         menuBotonGrado.pack(pady=1)
-        fig, ax = plt.subplots(figsize=(4, 2))  # Ajusta el tamaño del gráfico con figsize
+        fig, ax = plt.subplots(figsize=(6, 3))  # Ajusta el tamaño del gráfico con figsize
         canvas = tkagg.FigureCanvasTkAgg(fig, master=self.frameGrado)  # Integra el gráfico en Tkinter
 
         # Usa grid para posicionar el canvas
         canvas.get_tk_widget().pack(pady = 50)  # Posiciona el gráfico en la cuadrícula
 
-        # Configurar el tamaño del frame para que se ajuste al gráfico
-        #self.frameGrado.rowconfigure(0, weight=1)
-        #self.frameGrado.columnconfigure(0, weight=1)
+   
 
         # Dibujar la simulación inicial
-        mRayos.dibujarSimulacion(25, 150, ax)  # Dibuja la simulación inicial
+        mRayos.dibujarSimulacion(ax)  # Dibuja la simulación inicial
         #canvas.draw()
 
         # Distancia

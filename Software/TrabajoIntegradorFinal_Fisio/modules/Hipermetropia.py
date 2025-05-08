@@ -33,7 +33,7 @@ class Hipermetropia(VicioDeRefraccion):
         Returns:
             float: near point.
         """
-        return 1/((1/0.25)-self.dioptriasLenteCorrectora) #chequear
+        return 1/((1/0.25)-self.dioptriasLenteCorrectora) #falta el 1/diámetro del ojo
     
     def calcularPuntoLejano(self): ##Las dioptrias del lente para hipermetropia son positivas.
    
