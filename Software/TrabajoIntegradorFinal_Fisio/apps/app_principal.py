@@ -7,15 +7,22 @@ import modules.GestorDeImagenes as gi
 import modules.MarchaDeRayos as mr
 import matplotlib.pyplot as plt  # Para generar gráficos
 import matplotlib.backends.backend_tkagg as tkagg  # Para integrar gráficos de Matplotlib en Tkinter
-
+import modules.Hipermetropia as h
+import modules.Miopia as m
+import modules.Emetropia as e
 
 
 gArchivos = ga.gestorDeArchivos("Gestor de Archivos")
-gArchivos.extraeListadoDeArchivos("\\RepositorioTIF\\Software\\TrabajoIntegradorFinal_Fisio\\imagenes_nuevas")
+gArchivos.extraeListadoDeArchivos("C:\\Users\\Joama\\OneDrive\\Documents\\FACU\\Fisio\\RepositorioTIF\\Software\\TrabajoIntegradorFinal_Fisio\\imagenes_nuevas")
 directoriosImagenes = gArchivos.getListadoDeArchivos()
 gImagen = gi.gestorDeImagenes("Gestor de Imagenes")
 mRayos = mr.MarchaDeRayos("Marcha de Rayos", 250, 25, 1000)
 gradoDeDifuminado = 2  # Grado de difuminado inicial
+hipermetropia = h.Hipermetropia("Hipermétrope",1)
+miopia = m.Miopia("Miope",1)
+emetropia = e.Emetropia("Emétrope")
+
+
 
 # Imprimir los archivos cargados para verificar
 print("Archivos cargados desde el directorio:")
@@ -27,7 +34,14 @@ class AplicacionPrincipal:
     def __init__(self, root):
         self.root = root
         self.root.title("Simulador del ojo humano")
-        self.root.state('zoomed')  # Pantalla completa
+       # self.root.state('zoomed')  # Pantalla completa
+
+        # Variables iniciales
+        self.condicion = "Emétrope"  # Inicializa la condición como atributo de la clase
+        self.grado = "Grado 1"  # Inicializa el grado como atributo de la clase
+        self.distancia = "25 m"  # Inicializa la distancia como atributo de la clase
+        self.index = 0
+        self.gradoDeDifuminado = 0  # Grado de difuminado inicial
 
         # Cambiar el color de fondo de la ventana principal
         self.root.configure(bg="#c9c9c9")
@@ -72,20 +86,40 @@ class AplicacionPrincipal:
         self.frameGrid.columnconfigure(2, weight=1)
         self.frameGrid.rowconfigure(0, weight=1)
 
-        # Condición con fondo personalizado
+        #Definimos variables iniciales
+        
+        if(self.condicion == "Emétrope"):
+            self.puntoCercano = emetropia.getPuntoCercano()
+            self.puntoLejano = emetropia.getPuntoLejano()
+            self.lenteCorrectora = 0
+
+        elif(self.condicion == "Miope"):
+            miopia.setGrado(grado)
+            self.puntoCercano = miopia.calcularPuntoCercano()
+            self.puntoLejano = miopia.calcularPuntoLejano()
+            self.lenteCorrectora = miopia.getDioptriasLenteCorrectora()
+
+        elif(self.condicion == "Hipermétrope"):
+            hipermetropia.setGrado(grado)
+            self.puntoCercano = hipermetropia.calcularPuntoCercano()
+            self.puntoLejano = hipermetropia.calcularPuntoLejano()
+            self.lenteCorrectora = hipermetropia.getDioptriasLenteCorrectora()
+
+
+        # Condición with customized background
         self.frameCondicion = tk.Frame(self.frameGrid, bg="#c9c9c9")
         self.frameCondicion.grid(row=0, column=0, padx=10, sticky='nsew')
 
         condiciones = ["Emétrope", "Miope", "Hipermétrope"]
-        condicionSeleccionada = tk.StringVar(root)
-        condicionSeleccionada.set("Seleccione Condicion")
+        self.condicionSeleccionada = tk.StringVar(root)
+        self.condicionSeleccionada.set("Seleccione Condicion")
 
         menuBotonCondicion = tk.Menubutton(self.frameCondicion, text="Condición", relief=tk.FLAT, bg="#3b82f6", fg="white")
         menuBotonCondicion.menu = tk.Menu(menuBotonCondicion, tearoff=0)
         menuBotonCondicion["menu"] = menuBotonCondicion.menu
 
         for condicion in condiciones:
-            menuBotonCondicion.menu.add_radiobutton(label=condicion, variable=condicionSeleccionada, value=condicion)
+            menuBotonCondicion.menu.add_radiobutton(label=condicion, variable=self.condicionSeleccionada, value=condicion)
 
         menuBotonCondicion.pack(pady=4)
 
@@ -94,23 +128,23 @@ class AplicacionPrincipal:
         self.labelImagenOriginal = tk.Label(self.frameCondicion, image=self.imagenOriginal, bg="#c9c9c9")
         self.labelImagenOriginal.pack(expand=True, fill='both', padx=10, pady=10)
 
-        # Grado con fondo personalizado
+        # Grado with customized background
         self.frameGrado = tk.Frame(self.frameGrid, bg="#c9c9c9")
         self.frameGrado.grid(row=0, column=1, padx=20, sticky='nsew')
 
         grados = ["Grado 1", "Grado 2", "Grado 3"]
-        gradoSeleccionado = tk.StringVar(root)
-        gradoSeleccionado.set("Seleccione Grado")
+        self.gradoSeleccionado = tk.StringVar(root)
+        self.gradoSeleccionado.set("Seleccione Grado")
 
         menuBotonGrado = tk.Menubutton(self.frameGrado, text="Grado", relief=tk.FLAT, bg="#3b82f6", fg="white")
         menuBotonGrado.menu = tk.Menu(menuBotonGrado, tearoff=0)
         menuBotonGrado["menu"] = menuBotonGrado.menu
 
         for grado in grados:
-            menuBotonGrado.menu.add_radiobutton(label=grado, variable=gradoSeleccionado, value=grado)
+            menuBotonGrado.menu.add_radiobutton(label=grado, variable=self.gradoSeleccionado, value=grado)
 
         menuBotonGrado.pack(pady=1)
-        fig, ax = plt.subplots(figsize=(6, 3))  # Ajusta el tamaño del gráfico con figsize
+        fig, self.ax = plt.subplots(figsize=(6, 3))  # Ajusta el tamaño del gráfico con figsize
         canvas = tkagg.FigureCanvasTkAgg(fig, master=self.frameGrado)  # Integra el gráfico en Tkinter
 
         # Usa grid para posicionar el canvas
@@ -118,16 +152,23 @@ class AplicacionPrincipal:
 
 
         # Dibujar la simulación inicial
-        mRayos.dibujarSimulacion(ax)  # Dibuja la simulación inicial
+        mRayos.setDistanciaObjeto(float(self.distancia.replace(" m", ""))*10)        
+        if self.condicion == "Emétrope":
+            mRayos.setDistanciaFocal(emetropia.getDistanciaFocal())
+        elif self.condicion == "Miope":  
+            mRayos.setDistanciaFocal(miopia.getDistanciaFocal())
+        elif self.condicion == "Hipermétrope":
+            mRayos.setDistanciaFocal(hipermetropia.getDistanciaFocal())
+        mRayos.dibujarSimulacion(self.ax)  # Dibuja la simulación inicial
         #canvas.draw()
 
-        # Distancia con fondo personalizado
+        # Distancia with customized background
         self.frameDistancia = tk.Frame(self.frameGrid, bg="#c9c9c9")
         self.frameDistancia.grid(row=0, column=2, padx=10, sticky='nsew')
 
-        distancias = ["Punto lejano", "Punto cercano", "Punto medio"]
+        distancias = ["0.10 m","0.25 m", "0.5 m", "1 m", "2 m", "5 m", "10 m"]
         self.distanciaSeleccionada = tk.StringVar(root)
-        self.distanciaSeleccionada.set("Seleccione Distancia")
+        self.distanciaSeleccionada.set("10 m")
 
         menuBotonDistancia = tk.Menubutton(self.frameDistancia, text="Distancia", relief=tk.FLAT, bg="#3b82f6", fg="white")
         menuBotonDistancia.menu = tk.Menu(menuBotonDistancia, tearoff=0)
@@ -148,16 +189,27 @@ class AplicacionPrincipal:
         frameInfo.pack(padx=10, pady=5, anchor='w')  # Align to the left
         
         
-        tk.Label(frameInfo, text="Punto Remoto:", bg="#e0e0e0").pack(anchor='w')
-        tk.Label(frameInfo, text="Punto Lejano:", bg="#e0e0e0").pack(anchor='w')
-        tk.Label(frameInfo, text="Lente correctora:", bg="#e0e0e0").pack(anchor='w')
+        tk.Label(frameInfo, text="Punto Cercano: "+ str(self.puntoCercano) +"[m]", bg="#e0e0e0").pack(anchor='w')
+        tk.Label(frameInfo, text="Punto Lejano: "+ str(self.puntoLejano) +"[m]", bg="#e0e0e0").pack(anchor='w')
+        tk.Label(frameInfo, text="Lente correctora: "+ str(self.lenteCorrectora) +"[D]", bg="#e0e0e0").pack(anchor='w')
+
+        # Botón "Actualizar" en la esquina inferior derecha
+        actualizarBoton = tk.Button(
+            self.frameDistancia,
+            text="Actualizar",
+            command=self.actualizarValores,  # Pasa la referencia al método, sin paréntesis
+            relief=tk.RAISED,
+            bg="white"
+        )
+        actualizarBoton.pack(side='bottom', anchor='se', padx=10, pady=10)
+
 
    
 
     def mostrarImagen(self, index):
         if index < len(directoriosImagenes):
             print(f"Mostrando imagen {index}")
-            imagen_path = "\\RepositorioTIF\\Software\\TrabajoIntegradorFinal_Fisio\\imagenes_nuevas\\" + directoriosImagenes[index]
+            imagen_path = "C:\\Users\\Joama\\OneDrive\\Documents\\FACU\\Fisio\\RepositorioTIF\\Software\\TrabajoIntegradorFinal_Fisio\\imagenes_nuevas\\" + directoriosImagenes[index]
             print(f"Ruta de la imagen: {imagen_path}")
             imagen = gImagen.mostrar_imagen(imagen_path)
             imagen = imagen.resize((300, 300))
@@ -168,10 +220,11 @@ class AplicacionPrincipal:
     def mostrarImagenDifuminada(self, index, grado):
             if index < len(directoriosImagenes):
                 print(f"Mostrando imagen {index}")
-                imagen_path = "\\RepositorioTIF\\Software\\TrabajoIntegradorFinal_Fisio\\imagenes_nuevas\\" + directoriosImagenes[index]
+                imagen_path = "C:\\Users\\Joama\\OneDrive\\Documents\\FACU\\Fisio\\RepositorioTIF\\Software\\TrabajoIntegradorFinal_Fisio\\imagenes_nuevas\\" + directoriosImagenes[index]
                 print(f"Ruta de la imagen: {imagen_path}")
                 imagen = gImagen.mostrar_imagen(imagen_path)
                 imagen = imagen.resize((300, 300))
+            
                 imagenDifuminada = imagen.filter(ImageFilter.GaussianBlur(radius=grado))
                 self.imagenDifuminada = ImageTk.PhotoImage(imagenDifuminada)
                 self.labelImagenDifuminada.config(image=self.imagenDifuminada)
@@ -179,9 +232,47 @@ class AplicacionPrincipal:
 
     def mostrarImagenes(self, index, grado):
         self.mostrarImagen(index)
+        self.index = index
         self.mostrarImagenDifuminada(index, grado)
+    
+    def actualizarValores(self):
+        """Actualiza las variables globales con los valores seleccionados."""
+        # Actualizar los atributos de la clase con los valores seleccionados
+        self.condicion = self.condicionSeleccionada.get()
+        self.grado = self.gradoSeleccionado.get()
+        self.distancia = self.distanciaSeleccionada.get()
+
+        print(f"Condición: {self.condicion}, Grado: {self.grado}, Distancia: {self.distancia}")
+
+        # Actualizar la distancia del objeto en mRayos
+        mRayos.setDistanciaObjeto(float(self.distancia.replace(" m", "")) * 10)
+
+        # Actualizar la distancia focal y el grado de difuminado según la condición
+        if self.condicion == "Emétrope":
+            mRayos.setDistanciaFocal(emetropia.getDistanciaFocal())
+            self.gradoDeDifuminado = 0
+        elif self.condicion == "Miope":
+            miopia.setGrado(self.grado)  # Asegúrate de configurar el grado en la instancia de miopía
+            mRayos.setDistanciaFocal(miopia.getDistanciaFocal())
+            self.gradoDeDifuminado = miopia.getRadioDeDifuminacion()
+        elif self.condicion == "Hipermétrope":
+            hipermetropia.setGrado(self.grado)  # Asegúrate de configurar el grado en la instancia de hipermetropía
+            mRayos.setDistanciaFocal(hipermetropia.getDistanciaFocal())
+            self.gradoDeDifuminado = hipermetropia.getRadioDeDifuminacion()
+
+        # Redibujar la simulación
+        self.ax.clear()  # Limpia el gráfico antes de redibujar
+        mRayos.dibujarSimulacion(self.ax)  # Dibuja la simulación actualizada
+        self.ax.figure.canvas.draw()  # Actualiza el gráfico en la interfaz
+
+        # Actualizar la imagen difuminada
+        self.mostrarImagenDifuminada(self.index, self.gradoDeDifuminado)
+
+        # Mostrar mensaje de confirmación
+        messagebox.showinfo("Valores Actualizados", f"Condición: {self.condicion}\nGrado: {self.grado}\nDistancia: {self.distancia}")
         
 def ejecutar_gui():
+ 
     root = tk.Tk()
     app = AplicacionPrincipal(root)
     root.mainloop()

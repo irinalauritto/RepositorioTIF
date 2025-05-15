@@ -19,6 +19,24 @@ class MarchaDeRayos:
         self.distanciaObjetoMax = puntoLejano #cm  
         self.distanciaObjeto = 0  # Inicializar la distancia del objeto
 
+    def setDistanciaObjeto(self, distanciaObjeto):
+        """
+        Establece la distancia del objeto.
+
+        Args:
+            distanciaObjeto (float): Distancia del objeto.
+        """
+        self.distanciaObjeto = distanciaObjeto
+    
+    def setDistanciaFocal(self, distanciaFocal):
+        """
+        Establece la distancia focal.
+
+        Args:
+            distanciaFocal (float): Distancia focal.
+        """
+        self.distanciaFocal = distanciaFocal
+    
     def dibujarSimulacion(self,ax):
         self.ax = ax
         self.ax.clear()  # Limpia el gráfico actual
