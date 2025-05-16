@@ -33,7 +33,7 @@ class Hipermetropia(VicioDeRefraccion):
         self.puntoCercano = self.calcularPuntoCercano()
         self.puntoLejano = self.calcularPuntoLejano()
         self.radioDifuminacion = self.calcularRadioDeDifuminacion()
-        self.DistanciaFocal = self.calcularDistanciaFocal()
+        self.distanciaFocal = self.calcularDistanciaFocal()
         
     
     def getDistanciaFocal(self):    
@@ -69,6 +69,7 @@ class Hipermetropia(VicioDeRefraccion):
     
     def getDioptriasLenteCorrectora(self):
         return super().getDioptriasLenteCorrectora()
+    
     def calcularRadioDeDifuminacion(self):  
         """
         Calculates the radius of the blur circle.
@@ -76,8 +77,12 @@ class Hipermetropia(VicioDeRefraccion):
         Returns:
             float: radius of the blur circle.
         """
-        return 1/((1/0.25)-self.dioptriasLenteCorrectora)
-    
+        if self.grado == 1:
+            return 1
+        elif self.grado == 3:
+            return 3
+        elif self.grado == 6:
+            return 6
 
     def calcularDistanciaFocal(self):  
         """

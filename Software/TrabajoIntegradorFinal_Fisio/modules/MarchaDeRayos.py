@@ -19,6 +19,23 @@ class MarchaDeRayos:
         self.distanciaObjetoMax = puntoLejano #cm  
         self.distanciaObjeto = 0  # Inicializar la distancia del objeto
 
+    def setPuntoProximo(self, puntoProximo):
+        """
+        Establece el punto proximo.
+
+        Args:
+            puntoProximo (float): Punto proximo.
+        """
+        self.distanciaObjetoMin = puntoProximo
+    def setPuntoLejano(self, puntoLejano):
+        """
+        Establece el punto lejano.
+
+        Args:
+            puntoLejano (float): Punto lejano.
+        """
+        self.distanciaObjetoMax = puntoLejano
+
     def setDistanciaObjeto(self, distanciaObjeto):
         """
         Establece la distancia del objeto.
@@ -38,11 +55,19 @@ class MarchaDeRayos:
         self.distanciaFocal = distanciaFocal
     
     def dibujarSimulacion(self,ax):
+        """
+        No se puede aplicar escala logaritmica solo a la mitad del eje x. 
+        Probe ajustar y achicar el eje x, en funcion de la distancia del objeto, pero no es del todo conveniente.
+        Estoy trabajando con el punto lejano para eso. 
+        Creo que deberiamos trabajar con ifs. 
+        Si la distancia focal es tanto, entonces el eje va de tanto a tanto. y asi sucesivamente.
+        """
         self.ax = ax
         self.ax.clear()  # Limpia el gráfico actual
-        self.ax.set_xlim(-1500, 500)  # Establece los límites del eje X
+        #self.ax.set_xlim(-1500, 500)  # Establece los límites del eje X
+        self.ax.set_xlim(-((self.distanciaObjetoMax)+(self.distanciaObjetoMax*2)), 500)  # Establece los límites del eje X
         self.ax.set_ylim(-500, 500)  # Establece los límites del eje Y
-        self.ax.set_aspect('equal', adjustable='box')  # Asegura que los ejes tengan la misma escala
+        #self.ax.set_aspect('equal', adjustable='box')  # Asegura que los ejes tengan la misma escala
         self.ax.set_xticks([])  # Elimina las marcas del eje X
         self.ax.set_yticks([])  # Elimina las marcas del eje Y
         self.ax.axvline(x=0, color='blue', linestyle='--', label='Lente')  # Dibuja la lente

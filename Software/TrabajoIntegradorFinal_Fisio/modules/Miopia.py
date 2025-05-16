@@ -33,13 +33,13 @@ class Miopia(VicioDeRefraccion):
         self.puntoCercano = self.calcularPuntoCercano()
         self.puntoLejano = self.calcularPuntoLejano()
         self.radioDifuminacion = self.calcularRadioDeDifuminacion()
-        self.DistanciaFocal = self.calcularDistanciaFocal()  
+        self.distanciaFocal = self.calcularDistanciaFocal()  
 
     def getDistanciaFocal(self):    
         """
         Returns the focal distance of the eye.
         """ 
-        return self.distanciaFoca
+        return self.distanciaFocal
     
     def getDioptriasLenteCorrectora(self):
         return super().getDioptriasLenteCorrectora()
@@ -72,8 +72,13 @@ class Miopia(VicioDeRefraccion):
         Returns:
             float: radius of the blur circle.
         """
-        return 1/((1/0.25)-self.dioptriasLenteCorrectora)
-
+        if self.grado == 1:
+            return 1
+        elif self.grado == 3:
+            return 3
+        elif self.grado == 6:
+            return 6
+        
     def calcularDistanciaFocal(self):  
         """
         Calculates the focal distance.
