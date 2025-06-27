@@ -190,9 +190,9 @@ class AplicacionPrincipal:
         self.frameDistancia = tk.Frame(self.frameGrid, bg="#c9c9c9")
         self.frameDistancia.grid(row=0, column=2, padx=10, sticky='nsew')
 
-        distancias = ["0.10 m","0.25 m", "0.5 m", "1 m", "2 m", "5 m", "10 m"]
+        distancias = ["0.10 m","0.25 m", "0.33 m", "0.50 m", "1 m", "2 m", "10 m"]
         self.distanciaSeleccionada = tk.StringVar(root)
-        self.distanciaSeleccionada.set("0 m")
+        self.distanciaSeleccionada.set("0.25 m")
 
         # Menubutton Distancia
         menuBotonDistancia = tk.Menubutton(
@@ -326,7 +326,32 @@ class AplicacionPrincipal:
             self.puntoCercano = miopia.calcularPuntoCercano()
             self.puntoLejano = miopia.calcularPuntoLejano()
             self.lenteCorrectora = miopia.getDioptriasLenteCorrectora()
-            self.gradoDeDifuminado = miopia.calcularRadioDeDifuminacion()
+
+            #Difuminado para grado 1
+            if grado == 1 and ((self.distancia == "0.25 m" or self.distancia == "0.33 m" or self.distancia == "0.50 m" or 
+                                    self.distancia == "1 m" )):
+                self.gradoDeDifuminado = 0
+            if grado == 1 and ((self.distancia == "0.10 m" or self.distancia == "2 m" or 
+                                    self.distancia == "10 m" )):
+                self.gradoDeDifuminado = miopia.calcularRadioDeDifuminacion()
+
+            #Difuminado para grado 2
+            if grado == 2 and ((self.distancia == "0.25 m" or self.distancia == "0.33 m" or self.distancia == "0.50 m" or 
+                                    self.distancia == "1 m" )):
+                self.gradoDeDifuminado = 0
+            if grado == 1 and ((self.distancia == "0.10 m" or self.distancia == "2 m" or 
+                                    self.distancia == "10 m" )):
+                self.gradoDeDifuminado = miopia.calcularRadioDeDifuminacion()
+            
+            #Difuminado para grado 3
+            if grado == 1 and ((self.distancia == "0.25 m" or self.distancia == "0.33 m" or self.distancia == "0.50 m" or 
+                                    self.distancia == "1 m" )):
+                self.gradoDeDifuminado = 0
+            if grado == 1 and ((self.distancia == "0.10 m" or self.distancia == "2 m" or 
+                                    self.distancia == "10 m" )):
+                self.gradoDeDifuminado = miopia.calcularRadioDeDifuminacion()
+
+            print(f"Grado de difuminado: {self.gradoDeDifuminado}")
 
         elif self.condicion == "Hipermétrope":
             hipermetropia.setGrado(grado)  
