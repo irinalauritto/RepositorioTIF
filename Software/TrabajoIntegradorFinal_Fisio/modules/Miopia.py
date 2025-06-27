@@ -59,11 +59,11 @@ class Miopia(VicioDeRefraccion):
         Returns:
             float: near point.
         """
-        return 1/((1/0.25)+self.dioptriasLenteCorrectora)
+        return round(1/((1/0.25)+self.dioptriasLenteCorrectora), 2)
     
     def calcularPuntoLejano(self): ##Las dioptrias del lente para miopia son negativas, por lo que queda sumando en la formula.
         
-        return 1/((1/10)+self.dioptriasLenteCorrectora)
+        return round(1/((1/10)+self.dioptriasLenteCorrectora), 2)
     
     def calcularRadioDeDifuminacion(self):  
         """
