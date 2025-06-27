@@ -50,7 +50,7 @@ class Hipermetropia(VicioDeRefraccion):
         elif self.grado == 3:
             self.dioptriasLenteCorrectora = 3.00
         elif self.grado == 6:
-            self.dioptriasLenteCorrectora = 6.00
+            self.dioptriasLenteCorrectora = 3.50
     
    
 
@@ -61,11 +61,16 @@ class Hipermetropia(VicioDeRefraccion):
         Returns:
             float: near point.
         """
-        return 1/((1/0.25)-self.dioptriasLenteCorrectora) #falta el 1/diámetro del ojo
+        return round((((44)-self.dioptriasLenteCorrectora)-(1/0.025))**-1, 2)
     
     def calcularPuntoLejano(self): ##Las dioptrias del lente para hipermetropia son positivas.
    
-        return 1/((1/10)-self.dioptriasLenteCorrectora) #chequear
+        if self.grado == 1:
+            return 10
+        elif self.grado == 3:
+            return 20
+        elif self.grado == 6:
+            return 30  #preguntar si esta bien el punto lejano, ya que no se puede ver de lejos.
     
     def getDioptriasLenteCorrectora(self):
         return super().getDioptriasLenteCorrectora()
