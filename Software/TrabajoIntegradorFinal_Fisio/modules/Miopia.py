@@ -42,7 +42,7 @@ class Miopia(VicioDeRefraccion):
         return self.distanciaFocal
     
     def getDioptriasLenteCorrectora(self):
-        return super().getDioptriasLenteCorrectora()
+        return super().getDioptriasLenteCorrectora() # Aca no sería return self.dioptriasLenteCorrectora ???
     
     def definirLenteCorrectora(self): #Definimos 1,3, y 6 a los grados leve, moderado y severos, rspectivamente.
         if self.grado == 1:
@@ -59,11 +59,11 @@ class Miopia(VicioDeRefraccion):
         Returns:
             float: near point.
         """
-        return round(1/((1/0.25)+self.dioptriasLenteCorrectora), 2)
+        return round(1/((1/0.25)+self.dioptriasLenteCorrectora), 2) # [m]
     
     def calcularPuntoLejano(self): ##Las dioptrias del lente para miopia son negativas, por lo que queda sumando en la formula.
         
-        return round(1/((1/10)+self.dioptriasLenteCorrectora), 2)
+        return round(1/((1/10)+self.dioptriasLenteCorrectora), 2) # [m]
     
     def calcularRadioDeDifuminacion(self):  
         """
@@ -86,5 +86,5 @@ class Miopia(VicioDeRefraccion):
         Returns:
             float: focal distance.
         """
-        return 1/self.dioptriasLenteCorrectora
+        return 1/self.dioptriasLenteCorrectora  # [m]
 

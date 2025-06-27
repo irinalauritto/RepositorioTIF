@@ -23,6 +23,7 @@ class gestorDeArchivos:
         else:
             # Si el directorio no existe, limpiar la lista
             self.listado_de_archivos = []
+            print(f"El directorio {p_directorio} no existe o no es un directorio válido.")
 
     def getListadoDeArchivos(self):
         """Devuelve el listado de archivos."""

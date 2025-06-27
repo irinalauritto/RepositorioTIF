@@ -18,7 +18,8 @@ class MarchaDeRayos:
 
         # Esto quizas podria comentarse e inicializar la graficacion en condicion emetrope
         self.distanciaFocal = distanciaFocal #mm
-        self.distanciaImagen = 250 #mm
+        self.distanciaImagen = 250 #mm  
+        self.diametroOjo = 250 #mm Tamaño del ojo (fijo!!!)
         self.infinito = self.distanciaFocal*2000
         self.distanciaObjetoMin = puntoProximo #mm
         self.distanciaObjetoMax = puntoLejano #mm  
@@ -69,18 +70,18 @@ class MarchaDeRayos:
         """
         self.ax = ax
         self.ax.clear()  # Limpia el gráfico actual
-        self.ax.set_xlim(-self.distanciaObjetoMax*1.05, self.distanciaImagen*2)  # Establece los límites del eje X
+        self.ax.set_xlim(-self.distanciaObjetoMax*1.05, self.diametroOjo*2)  # Establece los límites del eje X
         self.ax.set_ylim(-200, 200)  # Establece los límites del eje Y
         #self.ax.set_aspect('equal', adjustable='box')  # Asegura que los ejes tengan la misma escala
         #self.ax.set_xticks([])  # Elimina las marcas del eje X
         #self.ax.set_yticks([])  # Elimina las marcas del eje Y
         self.ax.axvline(x=0, color='blue', linestyle='--', label='Lente')  # Dibuja la lente
         self.ax.axhline(y=0, color='black', linewidth=1)  # Dibuja el eje óptico
-        self.ax.axvline(x=self.distanciaImagen, color='black', linewidth=1, linestyle='--', label='Retina')  # Dibuja la retina
+        self.ax.axvline(x=self.diametroOjo, color='black', linewidth=1, linestyle='--', label='Retina')  # Dibuja la retina
         self.ax.add_patch(Ellipse(
-            (self.distanciaImagen/2, 0),                # Centro del óvalo
-            width=self.distanciaImagen,   # Ancho del óvalo (eje mayor)
-            height=self.distanciaImagen,  # Alto del óvalo (eje menor)
+            (self.diametroOjo/2, 0),                # Centro del óvalo
+            width=self.diametroOjo,   # Ancho del óvalo (eje mayor)
+            height=self.diametroOjo,  # Alto del óvalo (eje menor)
             edgecolor='cyan',       # Color del borde
             fill=False,             # Sin relleno
             linestyle='--',         # Estilo de línea
@@ -93,14 +94,14 @@ class MarchaDeRayos:
          # Dibuja el objeto
         self.ax.plot([-self.distanciaObjeto, -self.distanciaObjeto], [0, self.alturaObjeto], 'k-', linewidth=3, label='Objeto')
 
-         # Dentro de los puntos limite la imagen siempre se formará en la retina la incognita es el punto focal
+        # Dentro de los puntos limite la imagen siempre se formará en la retina la incognita es el punto focal
         # Calculo el punto focal
         if self.distanciaObjetoMin <= self.distanciaObjeto and self.distanciaObjeto <= self.distanciaObjetoMax: # Si se encuentra entre el pto lejano y proximo
-            self.distanciaFocal = 1/(1/self.distanciaObjeto+1/self.distanciaImagen)     # El ojo ajusta su potencia para ubicar la imagen en la retina (acomodacion)
+            self.distanciaFocal = 1/(1/self.distanciaObjeto+1/self.diametroOjo)     # El ojo ajusta su potencia para ubicar la imagen en la retina (acomodacion)
         if self.distanciaObjeto < self.distanciaObjetoMin:                      # Si el objeto esta dentro del punto proximo
-            self.distanciaFocal = 1/(1/self.distanciaObjetoMin+1/self.distanciaImagen) # La potencia del ojo es la maxima que puede lograr (correspondida a la distancia minima a la que puede ver claramente un objeto)
+            self.distanciaFocal = 1/(1/self.distanciaObjetoMin+1/self.diametroOjo) # La potencia del ojo es la maxima que puede lograr (correspondida a la distancia minima a la que puede ver claramente un objeto)
         if  self.distanciaObjetoMax < self.distanciaObjeto:                     # Si el objeto esta mas alla del punto lejano
-            self.distanciaFocal = 1/(1/self.distanciaObjetoMax+1/self.distanciaImagen) # La potencia del ojo es la minima que puede lograr (correspondida a la distancia maxima a la que puede ver claramente un objeto)
+            self.distanciaFocal = 1/(1/self.distanciaObjetoMax+1/self.diametroOjo) # La potencia del ojo es la minima que puede lograr (correspondida a la distancia maxima a la que puede ver claramente un objeto)
         
 
         # Imagen real

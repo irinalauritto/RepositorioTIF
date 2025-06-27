@@ -11,22 +11,18 @@ import modules.Hipermetropia as h
 import modules.Miopia as m
 import modules.Emetropia as e
 
-
 gArchivos = ga.gestorDeArchivos("Gestor de Archivos")
 gArchivos.extraeListadoDeArchivos("\\RepositorioTIF\\Software\\TrabajoIntegradorFinal_Fisio\\imagenes_nuevas")
 directoriosImagenes = gArchivos.getListadoDeArchivos()
-gImagen = gi.gestorDeImagenes("Gestor de Imagenes")
-mRayos = mr.MarchaDeRayos("Marcha de Rayos", 250, 250, 10000) # Inicia en condicion emétrope
-hipermetropia = h.Hipermetropia("Hipermétrope",1)
-miopia = m.Miopia("Miope",1)
-emetropia = e.Emetropia("Emétrope")
-
-
-
 # Imprimir los archivos cargados para verificar
 print("Archivos cargados desde el directorio:")
 for archivo in directoriosImagenes:
     print(archivo)
+gImagen = gi.gestorDeImagenes("Gestor de Imagenes")
+mRayos = mr.MarchaDeRayos("Marcha de Rayos", 250, 250, 10000) # Inicia en condicion emétrope
+hipermetropia = h.Hipermetropia("Hipermétrope",1)   # Inicializa la clase Hipermetropia
+miopia = m.Miopia("Miope",1) # Inicializa la clase Miopía
+emetropia = e.Emetropia("Emétrope") # Inicializa la clase Emetropia
 
 class AplicacionPrincipal:
     """Clase principal de la aplicación."""
@@ -34,7 +30,7 @@ class AplicacionPrincipal:
         self.root = root
         self.root.title("Simulador del ojo humano")
        # self.root.state('zoomed')  # Pantalla completa
-
+        
         # Variables iniciales
         self.condicion = "Emétrope"  # Inicializa la condición como atributo de la clase
         self.grado = "Grado 1"  # Inicializa el grado como atributo de la clase
@@ -251,9 +247,6 @@ class AplicacionPrincipal:
         )
         actualizarBoton.pack(side='bottom', fill='x', padx=10, pady=15)
 
-
-   
-
     def mostrarImagen(self, index):
         if index < len(directoriosImagenes):
             print(f"Mostrando imagen {index}")
@@ -309,20 +302,20 @@ class AplicacionPrincipal:
         # Actualizar la distancia focal y el grado de difuminado según la condición
         if self.condicion == "Emétrope":
             mRayos.setDistanciaFocal(emetropia.getDistanciaFocal())
-            mRayos.setPuntoProximo(emetropia.getPuntoCercano())
-            mRayos.setPuntoLejano(emetropia.getPuntoLejano())
-            self.puntoCercano = emetropia.getPuntoCercano()
-            self.puntoLejano = emetropia.getPuntoLejano()
+            mRayos.setPuntoProximo(emetropia.getPuntoCercano()*1000)  # Se convierte a mm
+            mRayos.setPuntoLejano(emetropia.getPuntoLejano()*1000)  # Se convierte a mm
+            self.puntoCercano = emetropia.getPuntoCercano() # [m]
+            self.puntoLejano = emetropia.getPuntoLejano() # [m]
             self.lenteCorrectora = 0
             self.gradoDeDifuminado = 0
 
         elif self.condicion == "Miope":
             miopia.setGrado(grado)  
             mRayos.setDistanciaFocal(miopia.getDistanciaFocal())
-            mRayos.setPuntoProximo(miopia.calcularPuntoCercano())
-            mRayos.setPuntoLejano(miopia.calcularPuntoLejano()) 
-            self.puntoCercano = miopia.calcularPuntoCercano()
-            self.puntoLejano = miopia.calcularPuntoLejano()
+            mRayos.setPuntoProximo(miopia.calcularPuntoCercano()*1000)  # Se convierte a mm
+            mRayos.setPuntoLejano(miopia.calcularPuntoLejano()*1000)  # Se convierte a mm
+            self.puntoCercano = miopia.calcularPuntoCercano() # [m]
+            self.puntoLejano = miopia.calcularPuntoLejano() # [m]
             self.lenteCorrectora = miopia.getDioptriasLenteCorrectora()
 
             #Difuminado para grado 1
@@ -354,16 +347,16 @@ class AplicacionPrincipal:
         elif self.condicion == "Hipermétrope":
             hipermetropia.setGrado(grado)  
             mRayos.setDistanciaFocal(hipermetropia.getDistanciaFocal())
-            mRayos.setPuntoProximo(hipermetropia.calcularPuntoCercano())
-            mRayos.setPuntoLejano(hipermetropia.calcularPuntoLejano())
-            self.puntoCercano = hipermetropia.calcularPuntoCercano()
-            self.puntoLejano = hipermetropia.calcularPuntoLejano()
+            mRayos.setPuntoProximo(hipermetropia.calcularPuntoCercano()*1000)  # Se convierte a mm
+            mRayos.setPuntoLejano(hipermetropia.calcularPuntoLejano()*1000)  # Se convierte a mm
+            self.puntoCercano = hipermetropia.calcularPuntoCercano() # [m]
+            self.puntoLejano = hipermetropia.calcularPuntoLejano() # [m]
             self.lenteCorrectora = hipermetropia.getDioptriasLenteCorrectora()
             self.gradoDeDifuminado = hipermetropia.calcularRadioDeDifuminacion()
 
         # Redibujar la simulación
         self.ax.clear()  # Limpia el gráfico antes de redibujar
-        mRayos.setDistanciaObjeto(float(self.distancia.replace(" m", "")) * 1000)  # Convertir a mm
+        mRayos.setDistanciaObjeto(float(self.distancia.replace(" m", "")) * 1000)  # Se convierte a mm
         mRayos.dibujarSimulacion(self.ax)  # Dibuja la simulación actualizada
         #self.ax.figure.canvas.draw()  # Actualiza el gráfico en la interfaz
 
