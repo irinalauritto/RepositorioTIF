@@ -6,17 +6,22 @@ from tkinter import ttk  # Para widgets avanzados de Tkinter
 import matplotlib.backends.backend_tkagg as tkagg  # Para integrar gráficos de Matplotlib en Tkinter
 from matplotlib.patches import Ellipse
 
+tamanoLegends = 5  # Tamaño de las leyendas en el gráfico
+
 class MarchaDeRayos:
     """Clase para simular la marcha de rayos en un sistema óptico."""
-    def __init__(self, nombre, distanciaFocal, puntoProximo, puntoLejano ):
+    def __init__(self, nombre, distanciaFocal, puntoProximo, puntoLejano):
         self.nombre = nombre
         self.ax = None  # Inicializar el eje como None
-        self.alturaObjeto = 170
+        self.alturaObjeto = 170 #mm
+
+
+        # Esto quizas podria comentarse e inicializar la graficacion en condicion emetrope
         self.distanciaFocal = distanciaFocal #mm
-        self.distanciaImagen = 250#mm
+        self.distanciaImagen = 250 #mm
         self.infinito = self.distanciaFocal*2000
-        self.distanciaObjetoMin = puntoProximo #cm
-        self.distanciaObjetoMax = puntoLejano #cm  
+        self.distanciaObjetoMin = puntoProximo #mm
+        self.distanciaObjetoMax = puntoLejano #mm  
         self.distanciaObjeto = 0  # Inicializar la distancia del objeto
 
     def setPuntoProximo(self, puntoProximo):
@@ -64,12 +69,11 @@ class MarchaDeRayos:
         """
         self.ax = ax
         self.ax.clear()  # Limpia el gráfico actual
-        #self.ax.set_xlim(-1500, 500)  # Establece los límites del eje X
-        self.ax.set_xlim(-self.distanciaObjetoMax * 1.2, self.distanciaImagen * 1.2)  # Establece los límites del eje X
-        self.ax.set_ylim(-500, 500)  # Establece los límites del eje Y
-        self.ax.set_aspect('equal', adjustable='box')  # Asegura que los ejes tengan la misma escala
-        self.ax.set_xticks([])  # Elimina las marcas del eje X
-        self.ax.set_yticks([])  # Elimina las marcas del eje Y
+        self.ax.set_xlim(-self.distanciaObjetoMax*1.05, self.distanciaImagen*2)  # Establece los límites del eje X
+        self.ax.set_ylim(-200, 200)  # Establece los límites del eje Y
+        #self.ax.set_aspect('equal', adjustable='box')  # Asegura que los ejes tengan la misma escala
+        #self.ax.set_xticks([])  # Elimina las marcas del eje X
+        #self.ax.set_yticks([])  # Elimina las marcas del eje Y
         self.ax.axvline(x=0, color='blue', linestyle='--', label='Lente')  # Dibuja la lente
         self.ax.axhline(y=0, color='black', linewidth=1)  # Dibuja el eje óptico
         self.ax.axvline(x=self.distanciaImagen, color='black', linewidth=1, linestyle='--', label='Retina')  # Dibuja la retina
@@ -83,7 +87,7 @@ class MarchaDeRayos:
             label='Ojo'
             ))  # Añade el óvalo al gráfico
 
-        self.ax.plot(-self.distanciaObjetoMin, 0, marker='X', markersize=6, label='Punto proximo')
+        self.ax.plot(-self.distanciaObjetoMin, 0, marker='X', markersize=6, label='Punto proximo')  # Dibuja el punto proximo
         self.ax.plot(-self.distanciaObjetoMax, 0, marker='X', markersize=6, label='Punto lejano')
 
          # Dibuja el objeto
@@ -127,16 +131,9 @@ class MarchaDeRayos:
                 [self.alturaObjeto, 0, self.alturaImagen],
                 'y', linewidth=0.5
             )
-# Actualiza la simulación con los valores de los sliders
-    def actualizarSimulacion(self, nuevaDistanciaFocal, nuevaDistanciaObjeto, nuevoPuntoProximo, nuevoPuntolejano):
-        self.distanciaFocal= nuevaDistanciaFocal  # Obtiene el valor del slider de longitud focal
-        self.distanciaObjeto = nuevaDistanciaObjeto  # Obtiene el valor del slider de distancia del objeto
-        self.distanciaObjetoMin = nuevoPuntoProximo
-        self.distanciaObjetoMax = nuevoPuntolejano  # Obtiene el valor del slider de distancia del objeto
-
-        self.dibujarSimulacion(self.ax)   
-
-
+        
+        ax.legend(fontsize=tamanoLegends)  # Muestra la leyenda
+        ax.figure.canvas.draw()  # Actualiza el gráfico
     
     def saludo(self):
         """
