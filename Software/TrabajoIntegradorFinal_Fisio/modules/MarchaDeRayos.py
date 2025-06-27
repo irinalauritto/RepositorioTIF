@@ -65,9 +65,9 @@ class MarchaDeRayos:
         self.ax = ax
         self.ax.clear()  # Limpia el gráfico actual
         #self.ax.set_xlim(-1500, 500)  # Establece los límites del eje X
-        self.ax.set_xlim(-((self.distanciaObjetoMax)+(self.distanciaObjetoMax*2)), 500)  # Establece los límites del eje X
+        self.ax.set_xlim(-self.distanciaObjetoMax * 1.2, self.distanciaImagen * 1.2)  # Establece los límites del eje X
         self.ax.set_ylim(-500, 500)  # Establece los límites del eje Y
-        #self.ax.set_aspect('equal', adjustable='box')  # Asegura que los ejes tengan la misma escala
+        self.ax.set_aspect('equal', adjustable='box')  # Asegura que los ejes tengan la misma escala
         self.ax.set_xticks([])  # Elimina las marcas del eje X
         self.ax.set_yticks([])  # Elimina las marcas del eje Y
         self.ax.axvline(x=0, color='blue', linestyle='--', label='Lente')  # Dibuja la lente
