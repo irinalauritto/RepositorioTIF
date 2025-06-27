@@ -16,7 +16,7 @@ gArchivos = ga.gestorDeArchivos("Gestor de Archivos")
 gArchivos.extraeListadoDeArchivos("\\RepositorioTIF\\Software\\TrabajoIntegradorFinal_Fisio\\imagenes_nuevas")
 directoriosImagenes = gArchivos.getListadoDeArchivos()
 gImagen = gi.gestorDeImagenes("Gestor de Imagenes")
-mRayos = mr.MarchaDeRayos("Marcha de Rayos", 250, 25, 1000)
+mRayos = mr.MarchaDeRayos("Marcha de Rayos", 250, 250, 10000) # Inicia en condicion emétrope
 hipermetropia = h.Hipermetropia("Hipermétrope",1)
 miopia = m.Miopia("Miope",1)
 emetropia = e.Emetropia("Emétrope")
@@ -176,7 +176,7 @@ class AplicacionPrincipal:
 
 
         # Dibujar la simulación inicial
-        mRayos.setDistanciaObjeto(float(self.distancia.replace(" m", ""))*100)        
+        mRayos.setDistanciaObjeto(float(self.distancia.replace(" m", ""))*1000)  # Convertir a mm   
         if self.condicion == "Emétrope":
             mRayos.setDistanciaFocal(emetropia.getDistanciaFocal())
         elif self.condicion == "Miope":  
@@ -300,8 +300,6 @@ class AplicacionPrincipal:
 
         print(f"Condición: {self.condicion}, Grado: {self.grado}, Distancia: {self.distancia}")
 
-        # Actualizar la distancia del objeto en mRayos
-        mRayos.setDistanciaObjeto(float(self.distancia.replace(" m", "")) * 100)
         if self.grado == "Grado 1":
             grado = 1
         elif self.grado == "Grado 2":   
@@ -365,9 +363,9 @@ class AplicacionPrincipal:
 
         # Redibujar la simulación
         self.ax.clear()  # Limpia el gráfico antes de redibujar
-        mRayos.setDistanciaObjeto(float(self.distancia.replace(" m", "")) * 100)
+        mRayos.setDistanciaObjeto(float(self.distancia.replace(" m", "")) * 1000)  # Convertir a mm
         mRayos.dibujarSimulacion(self.ax)  # Dibuja la simulación actualizada
-        self.ax.figure.canvas.draw()  # Actualiza el gráfico en la interfaz
+        #self.ax.figure.canvas.draw()  # Actualiza el gráfico en la interfaz
 
 
         # Actualizar la imagen difuminada
