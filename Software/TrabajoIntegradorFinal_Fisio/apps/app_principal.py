@@ -172,6 +172,8 @@ class AplicacionPrincipal:
 
         menuBotonGrado.pack(pady=1)
         fig, self.ax = plt.subplots(figsize=(6, 3))
+        self.ax.set_xticks([])  # Elimina las marcas del eje X
+        self.ax.set_yticks([])  # Elimina las marcas del eje Y
         canvas = tkagg.FigureCanvasTkAgg(fig, master=self.frameGrado)
         canvas.get_tk_widget().pack(pady=100)
 
@@ -495,7 +497,6 @@ class AplicacionPrincipal:
                 self.gradoDeDifuminado = 0
 
         self.ax.clear()
-        #mRayos.setDistanciaObjeto(float(self.distancia.replace(" m", "")) * 1000)
         mRayos.dibujarSimulacion(self.ax)
 
         self.mostrarImagenDifuminada(self.index, self.gradoDeDifuminado)

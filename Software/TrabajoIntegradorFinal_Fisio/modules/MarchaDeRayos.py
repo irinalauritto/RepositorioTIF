@@ -6,18 +6,21 @@ from tkinter import ttk  # Para widgets avanzados de Tkinter
 import matplotlib.backends.backend_tkagg as tkagg  # Para integrar gráficos de Matplotlib en Tkinter
 from matplotlib.patches import Ellipse
 
-tamanoLegends = 5  # Tamaño de las leyendas en el gráfico
+tamanoLegends = 6  # Tamaño de las leyendas en el gráfico
 Distancias = ["0.10 m","0.25 m", "0.33 m", "0.50 m", "1 m", "2 m", "10 m"] # Vector original, el que selecciona el usuario
-distancias = [10, 25, 33, 50, 100, 200, 1000] # Vector de distancias con el que trabaja la marcha de rayos
+distancias = [100, 200, 400, 500, 650, 800, 1000] # Vector de distancias con el que trabaja la marcha de rayos
+                                              # Verificar que la cantidad de elementos sea la misma en ambos vectores
+puntoProximoEmetrope = distancias[1]  # Punto proximo del ojo emétrope
+puntoLejanoEmetrope = distancias[6]  # Punto lejano
 
 class MarchaDeRayos:
     """Clase para simular la marcha de rayos en un sistema óptico."""
     def __init__(self, nombre):
         self.nombre = nombre
         self.ax = None  # Inicializar el eje como None
-        self.alturaObjeto = 170 #mm
+        self.alturaObjeto = 100 #mm
         #self.distanciaImagen = 25 #mm
-        self.diametroOjo = 250 #mm Tamaño del ojo (fijo!!!)
+        self.diametroOjo = 500 #mm Tamaño del ojo (fijo!!!)
         #self.infinito = self.distanciaFocal*2000
         #self.distanciaObjetoMin = puntoProximo #mm
         #self.distanciaObjetoMax = puntoLejano #mm  
@@ -40,28 +43,28 @@ class MarchaDeRayos:
         """
         self.grado = grado
         if self.condicion == "Emétrope": # Si es emetrope
-            self.distanciaObjetoMin = 25  # cm
-            self.distanciaObjetoMax = 1000 # cm
+            self.distanciaObjetoMin = puntoProximoEmetrope
+            self.distanciaObjetoMax = puntoLejanoEmetrope
         elif self.condicion == "Miope": # Si es miope
             if grado == 6:  # Si el grado es 6
-                self.distanciaObjetoMin = 5  # cm
-                self.distanciaObjetoMax = 500 # cm
+                self.distanciaObjetoMin = puntoProximoEmetrope*0.5  
+                self.distanciaObjetoMax = puntoLejanoEmetrope*0.7
             elif grado == 3:  # Si el grado es 3
-                self.distanciaObjetoMin = 10  # cm
-                self.distanciaObjetoMax = 700 # cm
+                self.distanciaObjetoMin = puntoProximoEmetrope*0.6  
+                self.distanciaObjetoMax = puntoLejanoEmetrope*0.8
             elif grado == 1:  # Si el grado es 1
-                self.distanciaObjetoMin = 15  # cm
-                self.distanciaObjetoMax = 900 # cm
+                self.distanciaObjetoMin = puntoProximoEmetrope*0.7  
+                self.distanciaObjetoMax = puntoLejanoEmetrope*0.9
         elif self.condicion == "Hipermétrope": # Si es hipermetrope
             if grado == 6:  # Si el grado es 6
-                self.distanciaObjetoMin = 700 # cm  
-                self.distanciaObjetoMax = 1500 # cm
+                self.distanciaObjetoMin = puntoProximoEmetrope*1.3  
+                self.distanciaObjetoMax = puntoLejanoEmetrope*1.3
             if grado == 3:  # Si el grado es 3
-                self.distanciaObjetoMin = 500 # cm
-                self.distanciaObjetoMax = 1300 # cm
+                self.distanciaObjetoMin = puntoProximoEmetrope*1.2  
+                self.distanciaObjetoMax = puntoLejanoEmetrope*1.2
             if grado == 1:  # Si el grado es 1
-                self.distanciaObjetoMin = 300 # cm
-                self.distanciaObjetoMax = 1100 # cm
+                self.distanciaObjetoMin = puntoProximoEmetrope*1.1  
+                self.distanciaObjetoMax = puntoLejanoEmetrope*1.1
 
     def setDistanciaObjeto(self, distanciaObjeto):
         """
@@ -102,11 +105,11 @@ class MarchaDeRayos:
     def dibujarSimulacion(self,ax):
         self.ax = ax
         self.ax.clear()  # Limpia el gráfico actual
-        self.ax.set_xlim(-1050, 260)  # Establece los límites del eje X
-        self.ax.set_ylim(-400, 200)  # Establece los límites del eje Y
+        self.ax.set_xlim(-puntoLejanoEmetrope*1.3, 550)  # Establece los límites del eje X
+        self.ax.set_ylim(-600, 600)  # Establece los límites del eje Y
         self.ax.set_aspect('equal', adjustable='box')  # Asegura que los ejes tengan la misma escala
-        #self.ax.set_xticks([])  # Elimina las marcas del eje X
-        #self.ax.set_yticks([])  # Elimina las marcas del eje Y
+        self.ax.set_xticks([])  # Elimina las marcas del eje X
+        self.ax.set_yticks([])  # Elimina las marcas del eje Y
         self.ax.axvline(x=0, color='blue', linestyle='--', label='Lente')  # Dibuja la lente
         self.ax.axhline(y=0, color='black', linewidth=1)  # Dibuja el eje óptico
         self.ax.axvline(x=self.diametroOjo, color='black', linewidth=1, linestyle='--', label='Retina')  # Dibuja la retina
@@ -164,10 +167,10 @@ class MarchaDeRayos:
                 [self.alturaObjeto, 0, self.alturaImagen],
                 'y', linewidth=0.5
             )
-        
-        #ax.legend(fontsize=tamanoLegends)  # Muestra la leyenda
-        ax.figure.canvas.draw()  # Actualiza el gráfico
-    
+
+        self.ax.legend(fontsize=tamanoLegends, loc='lower left')  # Muestra la leyenda
+        self.ax.figure.canvas.draw()  # Actualiza el gráfico
+
     def saludo(self):
         """
         Devuelve un saludo.
