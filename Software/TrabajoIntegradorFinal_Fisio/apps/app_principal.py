@@ -19,10 +19,11 @@ print("Archivos cargados desde el directorio:")
 for archivo in directoriosImagenes:
     print(archivo)
 gImagen = gi.gestorDeImagenes("Gestor de Imagenes")
-mRayos = mr.MarchaDeRayos("Marcha de Rayos", 250, 250, 10000)
+mRayos = mr.MarchaDeRayos("Marcha de Rayos") # [mm]
 hipermetropia = h.Hipermetropia("Hipermétrope",1)
 miopia = m.Miopia("Miope",1)
 emetropia = e.Emetropia("Emétrope")
+distancias = ["0.10 m","0.25 m", "0.33 m", "0.50 m", "1 m", "2 m", "10 m"]
 
 class AplicacionPrincipal:
     """Clase principal de la aplicación."""
@@ -30,7 +31,7 @@ class AplicacionPrincipal:
         self.root = root
         self.root.title("Simulador del ojo humano")
         self.condicion = "Emétrope"
-        self.grado = "Grado 1"
+        self.grado = "Grado 1" # "Grado 1" o simplemente 1
         self.distancia = "10 m"
         self.index = 0
         self.gradoDeDifuminado = 0
@@ -174,8 +175,10 @@ class AplicacionPrincipal:
         canvas = tkagg.FigureCanvasTkAgg(fig, master=self.frameGrado)
         canvas.get_tk_widget().pack(pady=100)
 
-        # Simulación inicial
-        mRayos.setDistanciaObjeto(float(self.distancia.replace(" m", ""))*1000)
+        # Simulación inicial 
+        # Se puede reemplazar esto pasando a mRayos simplemente condición, grado y distancia (o posicion del elemento en vector distancias) como parámetros
+        """
+        mRayos.setDistanciaObjeto(float(self.distancia.replace(" m", ""))*1000) # Convierte a mm
         if self.condicion == "Emétrope":
             mRayos.setDistanciaFocal(emetropia.getDistanciaFocal())
         elif self.condicion == "Miope":
@@ -183,12 +186,12 @@ class AplicacionPrincipal:
         elif self.condicion == "Hipermétrope":
             mRayos.setDistanciaFocal(hipermetropia.getDistanciaFocal())
         mRayos.dibujarSimulacion(self.ax)
-
+"""
         # Distancia
         self.frameDistancia = tk.Frame(self.frameGrid, bg="#c9c9c9")
         self.frameDistancia.grid(row=0, column=2, padx=10, sticky='nsew')
 
-        distancias = ["0.10 m","0.25 m", "0.33 m", "0.50 m", "1 m", "2 m", "10 m"]
+        #distancias = ["0.10 m","0.25 m", "0.33 m", "0.50 m", "1 m", "2 m", "10 m"]
         self.distanciaSeleccionada = tk.StringVar(root)
         self.distanciaSeleccionada.set("0.25 m")
 
@@ -410,19 +413,25 @@ class AplicacionPrincipal:
             grado = 1
 
         if self.condicion == "Emétrope":
-            mRayos.setDistanciaFocal(emetropia.getDistanciaFocal())
-            mRayos.setPuntoProximo(emetropia.getPuntoCercano()*1000)
-            mRayos.setPuntoLejano(emetropia.getPuntoLejano()*1000)
+            mRayos.setCondicion("Emétrope")
+            mRayos.setGrado(1)  # Emétrope no tiene grado, se utiliza grado 1 por defecto
+            mRayos.setDistanciaObjeto(distancias.index(self.distancia)) 
+            #mRayos.setDistanciaFocal(emetropia.getDistanciaFocal())
+            #mRayos.setPuntoProximo(emetropia.getPuntoCercano()*1000)
+            #mRayos.setPuntoLejano(emetropia.getPuntoLejano()*1000)
             self.puntoCercano = emetropia.getPuntoCercano()
             self.puntoLejano = emetropia.getPuntoLejano()
             self.lenteCorrectora = 0
             self.gradoDeDifuminado = 0
 
-        elif self.condicion == "Miope":
+        elif self.condicion == "Miope": # a mRayos se le pasa en orden condicion -> grado -> distancia
             miopia.setGrado(grado)
-            mRayos.setDistanciaFocal(miopia.getDistanciaFocal())
-            mRayos.setPuntoProximo(miopia.calcularPuntoCercano()*1000)
-            mRayos.setPuntoLejano(miopia.calcularPuntoLejano()*1000)
+            mRayos.setCondicion("Miope")
+            mRayos.setGrado(grado)
+            mRayos.setDistanciaObjeto(distancias.index(self.distancia))
+            #mRayos.setDistanciaFocal(miopia.getDistanciaFocal())
+            #mRayos.setPuntoProximo(miopia.calcularPuntoCercano()*1000)
+            #mRayos.setPuntoLejano(miopia.calcularPuntoLejano()*1000)
             self.puntoCercano = miopia.calcularPuntoCercano()
             self.puntoLejano = miopia.calcularPuntoLejano()
             self.lenteCorrectora = miopia.getDioptriasLenteCorrectora()
@@ -453,12 +462,16 @@ class AplicacionPrincipal:
 
         elif self.condicion == "Hipermétrope":
             hipermetropia.setGrado(grado)
-            mRayos.setDistanciaFocal(hipermetropia.getDistanciaFocal())
-            mRayos.setPuntoProximo(hipermetropia.calcularPuntoCercano()*1000)
-            mRayos.setPuntoLejano(hipermetropia.calcularPuntoLejano()*1000)
+            mRayos.setCondicion("Hipermétrope") 
+            mRayos.setGrado(grado)
+            mRayos.setDistanciaObjeto(distancias.index(self.distancia))
+            #mRayos.setDistanciaFocal(hipermetropia.getDistanciaFocal())
+            #mRayos.setPuntoProximo(hipermetropia.calcularPuntoCercano()*1000)
+            #mRayos.setPuntoLejano(hipermetropia.calcularPuntoLejano()*1000)
             self.puntoCercano = hipermetropia.calcularPuntoCercano()
             self.puntoLejano = hipermetropia.calcularPuntoLejano()
             self.lenteCorrectora = hipermetropia.getDioptriasLenteCorrectora()
+
             #Difuminado para grado 1
             if grado == 1 and (( self.distancia == "0.33 m" or self.distancia == "0.50 m" or 
                                     self.distancia == "1 m" or self.distancia == "2 m" or self.distancia == "10 m" )):
@@ -482,7 +495,7 @@ class AplicacionPrincipal:
                 self.gradoDeDifuminado = 0
 
         self.ax.clear()
-        mRayos.setDistanciaObjeto(float(self.distancia.replace(" m", "")) * 1000)
+        #mRayos.setDistanciaObjeto(float(self.distancia.replace(" m", "")) * 1000)
         mRayos.dibujarSimulacion(self.ax)
 
         self.mostrarImagenDifuminada(self.index, self.gradoDeDifuminado)

@@ -9,9 +9,9 @@ class Emetropia():
         """
         Initializes the class.
         """
-        self.puntoCercano = .250 #[m]
+        self.puntoCercano = .25 #[m]
         self.puntoLejano = 10.000  #[m]
-        self.distanciaFocal = .250 #[m]
+        self.distanciaFocal = .025 #[m]
         self.dioptriasLenteCorrectora = 0
         self.radioDeDifuminacion = 0
         self.nombre = nombre

@@ -10,7 +10,7 @@ from matplotlib.patches import Ellipse
 altura_objeto = 170
 focal_length = 100
 infinito = focal_length*2000
-condicion = ['Emetrope', 'Miope', 'Hipermetrope']
+condicion = ['Emétrope', 'Miope', 'Hipermétrope']
 condicion_seleccionada = 0 # 0 emetrope, 1 miope, 2 hipermetrope
 distance_values = [5, 10, 15, 20, 25, 30, 100, 300, 500, 700, 1000, 1500] # cm
 
