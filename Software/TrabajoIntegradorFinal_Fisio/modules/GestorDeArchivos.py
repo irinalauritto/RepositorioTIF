@@ -11,6 +11,8 @@ class gestorDeArchivos:
         """Obtiene el listado de archivos en el directorio especificado."""
         aux_listado_de_archivos = []
         self.directorio = p_directorio
+        
+        #print("Ruta absoluta:", os.path.abspath(p_directorio)) # Para depuración, mostrar la ruta absoluta del directorio
 
         if os.path.isdir(p_directorio):
             # Listar todos los elementos del directorio
