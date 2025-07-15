@@ -19,7 +19,7 @@ print("Archivos cargados desde el directorio:")
 for archivo in directoriosImagenes:
     print(archivo)
 gImagen = gi.gestorDeImagenes("Gestor de Imagenes")
-mRayos = mr.MarchaDeRayos("Marcha de Rayos") # [mm]
+mRayos = mr.MarchaDeRayos("Marcha de Rayos") 
 hipermetropia = h.Hipermetropia("Hipermétrope",1)
 miopia = m.Miopia("Miope",1)
 emetropia = e.Emetropia("Emétrope")
@@ -30,9 +30,9 @@ class AplicacionPrincipal:
     def __init__(self, root):
         self.root = root
         self.root.title("Simulador del ojo humano")
-        self.condicion = "Emétrope"
-        self.grado = "Grado 1" # "Grado 1" o simplemente 1
-        self.distancia = "10 m"
+        #self.condicion = "Emétrope"
+        #self.grado = "Grado 1" 
+        #self.distancia = "10 m"
         self.index = 0
         self.gradoDeDifuminado = 0
 
@@ -91,28 +91,12 @@ class AplicacionPrincipal:
         self.frameGrado = tk.Frame(self.frameGrid, bg="#c9c9c9")
         self.frameDistancia = tk.Frame(self.frameGrid, bg="#c9c9c9")
 
-        # Ahora sí, ubícalos en el grid
+        # Se ubican los frames en el grid
         self.frameCondicion.grid(row=0, column=0, padx=10, sticky='nsew')
         self.frameGrado.grid(row=0, column=1, padx=20, sticky='nsew')
         self.frameDistancia.grid(row=0, column=2, padx=10, sticky='nsew')
-
-        # Variables iniciales
-        if(self.condicion == "Emétrope"):
-            self.puntoCercano = emetropia.getPuntoCercano()
-            self.puntoLejano = emetropia.getPuntoLejano()
-            self.lenteCorrectora = 0
-        elif(self.condicion == "Miope"):
-            miopia.setGrado(self.grado)
-            self.puntoCercano = miopia.calcularPuntoCercano()
-            self.puntoLejano = miopia.calcularPuntoLejano()
-            self.lenteCorrectora = miopia.getDioptriasLenteCorrectora()
-        elif(self.condicion == "Hipermétrope"):
-            hipermetropia.setGrado(self.grado)
-            self.puntoCercano = hipermetropia.calcularPuntoCercano()
-            self.puntoLejano = hipermetropia.calcularPuntoLejano()
-            self.lenteCorrectora = hipermetropia.getDioptriasLenteCorrectora()
-
-        # Condición
+        
+        # Botón de condición
         self.frameCondicion = tk.Frame(self.frameGrid, bg="#c9c9c9")
         self.frameCondicion.grid(row=0, column=0, padx=10, sticky='nsew')
 
@@ -145,7 +129,7 @@ class AplicacionPrincipal:
         self.labelImagenOriginal = tk.Label(self.frameCondicion, image=self.imagenOriginal, bg="#c9c9c9")
         self.labelImagenOriginal.pack(expand=True, fill='both', padx=10, pady=10)
 
-        # Grado
+        # Botón de grado
         self.frameGrado = tk.Frame(self.frameGrid, bg="#c9c9c9")
         self.frameGrado.grid(row=0, column=1, padx=20, sticky='nsew')
 
@@ -171,28 +155,18 @@ class AplicacionPrincipal:
             menuBotonGrado.menu.add_radiobutton(label=grado, variable=self.gradoSeleccionado, value=grado)
 
         menuBotonGrado.pack(pady=1)
-        fig, self.ax = plt.subplots(figsize=(6, 3))
+
+        # Se crea el gráfico donde irá la marcha de rayos
+        fig, self.ax = plt.subplots(figsize=(4, 3))
         self.ax.set_xticks([])  # Elimina las marcas del eje X
         self.ax.set_yticks([])  # Elimina las marcas del eje Y
         canvas = tkagg.FigureCanvasTkAgg(fig, master=self.frameGrado)
         canvas.get_tk_widget().pack(pady=100)
+        # Simulación inicial en blanco
 
-        # Simulación inicial 
-        # Se puede reemplazar esto pasando a mRayos simplemente condición, grado y distancia (o posicion del elemento en vector distancias) como parámetros
-        """
-        mRayos.setDistanciaObjeto(float(self.distancia.replace(" m", ""))*1000) # Convierte a mm
-        if self.condicion == "Emétrope":
-            mRayos.setDistanciaFocal(emetropia.getDistanciaFocal())
-        elif self.condicion == "Miope":
-            mRayos.setDistanciaFocal(miopia.getDistanciaFocal())
-        elif self.condicion == "Hipermétrope":
-            mRayos.setDistanciaFocal(hipermetropia.getDistanciaFocal())
-        mRayos.dibujarSimulacion(self.ax)
-"""
-        # Distancia
+        # Botón de distancia
         self.frameDistancia = tk.Frame(self.frameGrid, bg="#c9c9c9")
         self.frameDistancia.grid(row=0, column=2, padx=10, sticky='nsew')
-
         #distancias = ["0.10 m","0.25 m", "0.33 m", "0.50 m", "1 m", "2 m", "10 m"]
         self.distanciaSeleccionada = tk.StringVar(root)
         self.distanciaSeleccionada.set("0.25 m")
@@ -223,7 +197,7 @@ class AplicacionPrincipal:
         # Información de distancia y botón
         frameInfo = tk.Frame(self.frameSimulacion, bd=2, relief=tk.SUNKEN, padx=35, pady=15, bg="#e0e0e0")
         frameInfo.pack(padx=10, pady=5, anchor='w')
-
+        """
         self.labelCondicion = tk.Label(frameInfo, text="Condición: "+ self.condicion, bg="#e0e0e0")
         self.labelCondicion.pack(anchor='w')
         self.labelGrado = tk.Label(frameInfo, text= self.grado, bg="#e0e0e0")
@@ -235,6 +209,20 @@ class AplicacionPrincipal:
         self.labelPuntoLejano = tk.Label(frameInfo, text="Punto Lejano: "+ str(self.puntoLejano) +"[m]", bg="#e0e0e0")
         self.labelPuntoLejano.pack(anchor='w')
         self.labelLenteCorrectora = tk.Label(frameInfo, text="Lente correctora: "+ str(self.lenteCorrectora) +"[D]", bg="#e0e0e0")
+        self.labelLenteCorrectora.pack(anchor='w')
+        self.mostrarImagenes(self.index, self.gradoDeDifuminado)
+"""
+        self.labelCondicion = tk.Label(frameInfo, text="", bg="#e0e0e0")
+        self.labelCondicion.pack(anchor='w')
+        self.labelGrado = tk.Label(frameInfo, text= "", bg="#e0e0e0")
+        self.labelGrado.pack(anchor='w')
+        self.labelDistancia = tk.Label(frameInfo, text="", bg="#e0e0e0")
+        self.labelDistancia.pack(anchor='w')
+        self.labelPuntoCercano = tk.Label(frameInfo, text="", bg="#e0e0e0")
+        self.labelPuntoCercano.pack(anchor='w')
+        self.labelPuntoLejano = tk.Label(frameInfo, text="", bg="#e0e0e0")
+        self.labelPuntoLejano.pack(anchor='w')
+        self.labelLenteCorrectora = tk.Label(frameInfo, text="", bg="#e0e0e0")
         self.labelLenteCorrectora.pack(anchor='w')
         self.mostrarImagenes(self.index, self.gradoDeDifuminado)
 
@@ -418,9 +406,7 @@ class AplicacionPrincipal:
             mRayos.setCondicion("Emétrope")
             mRayos.setGrado(1)  # Emétrope no tiene grado, se utiliza grado 1 por defecto
             mRayos.setDistanciaObjeto(distancias.index(self.distancia)) 
-            #mRayos.setDistanciaFocal(emetropia.getDistanciaFocal())
-            #mRayos.setPuntoProximo(emetropia.getPuntoCercano()*1000)
-            #mRayos.setPuntoLejano(emetropia.getPuntoLejano()*1000)
+
             self.puntoCercano = emetropia.getPuntoCercano()
             self.puntoLejano = emetropia.getPuntoLejano()
             self.lenteCorrectora = 0
@@ -428,16 +414,16 @@ class AplicacionPrincipal:
 
         elif self.condicion == "Miope": # a mRayos se le pasa en orden condicion -> grado -> distancia
             miopia.setGrado(grado)
+            self.puntoCercano = miopia.getPuntoCercano()
+            self.puntoLejano = miopia.getPuntoLejano()
+            self.lenteCorrectora = miopia.getDioptriasLenteCorrectora()
+
             mRayos.setCondicion("Miope")
             mRayos.setGrado(grado)
             mRayos.setDistanciaObjeto(distancias.index(self.distancia))
-            #mRayos.setDistanciaFocal(miopia.getDistanciaFocal())
-            #mRayos.setPuntoProximo(miopia.calcularPuntoCercano()*1000)
-            #mRayos.setPuntoLejano(miopia.calcularPuntoLejano()*1000)
-            self.puntoCercano = miopia.calcularPuntoCercano()
-            self.puntoLejano = miopia.calcularPuntoLejano()
-            self.lenteCorrectora = miopia.getDioptriasLenteCorrectora()
-            
+
+            self.gradoDeDifuminado = miopia.calcularRadioDeDifuminacion(float(self.distancia.replace(" m", "")))
+            """
             #Difuminado para grado 1
             if grado == 1 and ((self.distancia == "0.25 m" or self.distancia == "0.33 m" or self.distancia == "0.50 m" or 
                                     self.distancia == "1 m" )):
@@ -461,19 +447,19 @@ class AplicacionPrincipal:
             if grado == 1 and ((self.distancia == "0.10 m" or self.distancia == "2 m" or 
                                     self.distancia == "10 m" )):
                 self.gradoDeDifuminado = miopia.calcularRadioDeDifuminacion()
-
+"""
         elif self.condicion == "Hipermétrope":
             hipermetropia.setGrado(grado)
+            self.puntoCercano = hipermetropia.getPuntoCercano()
+            self.puntoLejano = hipermetropia.getPuntoLejano()
+            self.lenteCorrectora = hipermetropia.getDioptriasLenteCorrectora()
+
             mRayos.setCondicion("Hipermétrope") 
             mRayos.setGrado(grado)
             mRayos.setDistanciaObjeto(distancias.index(self.distancia))
-            #mRayos.setDistanciaFocal(hipermetropia.getDistanciaFocal())
-            #mRayos.setPuntoProximo(hipermetropia.calcularPuntoCercano()*1000)
-            #mRayos.setPuntoLejano(hipermetropia.calcularPuntoLejano()*1000)
-            self.puntoCercano = hipermetropia.calcularPuntoCercano()
-            self.puntoLejano = hipermetropia.calcularPuntoLejano()
-            self.lenteCorrectora = hipermetropia.getDioptriasLenteCorrectora()
 
+            self.gradoDeDifuminado = hipermetropia.calcularRadioDeDifuminacion(float(self.distancia.replace(" m", "")))
+            """
             #Difuminado para grado 1
             if grado == 1 and (( self.distancia == "0.33 m" or self.distancia == "0.50 m" or 
                                     self.distancia == "1 m" or self.distancia == "2 m" or self.distancia == "10 m" )):
@@ -495,27 +481,21 @@ class AplicacionPrincipal:
                 self.gradoDeDifuminado = hipermetropia
             if grado == 3 and ((self.distancia == "2 m" or self.distancia == "10 m" )):
                 self.gradoDeDifuminado = 0
-
+"""
         self.ax.clear()
         mRayos.dibujarSimulacion(self.ax)
 
         self.mostrarImagenDifuminada(self.index, self.gradoDeDifuminado)
-        if self.condicionSeleccionada.get() == "Emétrope":
-            self.puntoCercano = emetropia.getPuntoCercano()
-            self.labelCondicion.config(text="Condición: " + self.condicion)
-            self.labelGrado.config("Grado: No corresponde")
-            self.labelDistancia.config(text="Distancia: " + self.distancia)
-            self.labelPuntoCercano.config(text="Punto Cercano: " + str(self.puntoCercano) + "[m]")
-            self.labelPuntoLejano.config(text="Punto Lejano: " + str(self.puntoLejano) + "[m]")
-            self.labelLenteCorrectora.config(text="Lente correctora: " + str(self.lenteCorrectora) + "[D]")
+        
+        self.labelCondicion.config(text="Condición: " + self.condicion)
+        if self.condicion == "Emétrope":
+            self.labelGrado.config(text="")
         else:
-            #self.puntoCercano = emetropia.getPuntoCercano()
-            self.labelCondicion.config(text="Condición: " + self.condicion)
             self.labelGrado.config(text=self.grado)
-            self.labelDistancia.config(text="Distancia: " + self.distancia)
-            self.labelPuntoCercano.config(text="Punto Cercano: " + str(self.puntoCercano) + "[m]")
-            self.labelPuntoLejano.config(text="Punto Lejano: " + str(self.puntoLejano) + "[m]")
-            self.labelLenteCorrectora.config(text="Lente correctora: " + str(self.lenteCorrectora) + "[D]")
+        self.labelDistancia.config(text="Distancia: " + self.distancia)
+        self.labelPuntoCercano.config(text="Punto Cercano: " + str(self.puntoCercano) + "[m]")
+        self.labelPuntoLejano.config(text="Punto Lejano: " + str(self.puntoLejano) + "[m]")
+        self.labelLenteCorrectora.config(text="Lente correctora: " + str(self.lenteCorrectora) + "[D]")
 
     def galeria_anterior(self):
         if self.galeria_index > 0:
