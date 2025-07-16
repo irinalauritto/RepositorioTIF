@@ -12,27 +12,32 @@ import modules.Miopia as m
 import modules.Emetropia as e
 from tkinter import ttk
 
+# Creacion de objetos
 gArchivos = ga.gestorDeArchivos("Gestor de Archivos")
-gArchivos.extraeListadoDeArchivos("\\RepositorioTIF\\Software\\TrabajoIntegradorFinal_Fisio\\imagenes_nuevas")
-directoriosImagenes = gArchivos.getListadoDeArchivos()
-print("Archivos cargados desde el directorio:")
-for archivo in directoriosImagenes:
-    print(archivo)
 gImagen = gi.gestorDeImagenes("Gestor de Imagenes")
 mRayos = mr.MarchaDeRayos("Marcha de Rayos") 
 hipermetropia = h.Hipermetropia("Hipermétrope",1)
 miopia = m.Miopia("Miope",1)
 emetropia = e.Emetropia("Emétrope")
-distancias = ["0.10 m","0.25 m", "0.33 m", "0.50 m", "1 m", "2 m", "10 m"]
+
+# Carga de archivos
+gArchivos.extraeListadoDeArchivos("\\RepositorioTIF\\Software\\TrabajoIntegradorFinal_Fisio\\imagenes_nuevas")
+directoriosImagenes = gArchivos.getListadoDeArchivos()
+print("Archivos cargados desde el directorio:")
+for archivo in directoriosImagenes:
+    print(archivo)
+
+# Creación de vector distancias
+distancias = ["0.10 m","0.25 m", "0.33 m", "0.50 m", "1 m", "2 m", "10 m","15 m"]
+
+# Variable auxiliar de limite de difuminación en las imagenes arbol y vela
+limiteDifuminacion = 10
 
 class AplicacionPrincipal:
     """Clase principal de la aplicación."""
     def __init__(self, root):
         self.root = root
         self.root.title("Simulador del ojo humano")
-        #self.condicion = "Emétrope"
-        #self.grado = "Grado 1" 
-        #self.distancia = "10 m"
         self.index = 0
         self.gradoDeDifuminado = 0
 
@@ -58,6 +63,7 @@ class AplicacionPrincipal:
         self.frameBarraTareas = tk.Frame(self.frameSimulacion, bg="#c9c9c9")
         self.frameBarraTareas.pack(fill='x')
 
+        # --- PESTAÑA DE SIMULACION ---
         # Botón para seleccionar imágenes
         imagenes = ["Arbol", "Vela"]
         self.imagenSeleccionada = tk.StringVar(root)
@@ -125,10 +131,6 @@ class AplicacionPrincipal:
 
         menuBotonCondicion.pack(pady=4)
 
-        self.imagenOriginal = ImageTk.PhotoImage(Image.new("RGB", (300, 300), "gray"))
-        self.labelImagenOriginal = tk.Label(self.frameCondicion, image=self.imagenOriginal, bg="#c9c9c9")
-        self.labelImagenOriginal.pack(expand=True, fill='both', padx=10, pady=10)
-
         # Botón de grado
         self.frameGrado = tk.Frame(self.frameGrid, bg="#c9c9c9")
         self.frameGrado.grid(row=0, column=1, padx=20, sticky='nsew')
@@ -156,18 +158,9 @@ class AplicacionPrincipal:
 
         menuBotonGrado.pack(pady=1)
 
-        # Se crea el gráfico donde irá la marcha de rayos
-        fig, self.ax = plt.subplots(figsize=(4, 3))
-        self.ax.set_xticks([])  # Elimina las marcas del eje X
-        self.ax.set_yticks([])  # Elimina las marcas del eje Y
-        canvas = tkagg.FigureCanvasTkAgg(fig, master=self.frameGrado)
-        canvas.get_tk_widget().pack(pady=100)
-        # Simulación inicial en blanco
-
         # Botón de distancia
         self.frameDistancia = tk.Frame(self.frameGrid, bg="#c9c9c9")
         self.frameDistancia.grid(row=0, column=2, padx=10, sticky='nsew')
-        #distancias = ["0.10 m","0.25 m", "0.33 m", "0.50 m", "1 m", "2 m", "10 m"]
         self.distanciaSeleccionada = tk.StringVar(root)
         self.distanciaSeleccionada.set("0.25 m")
 
@@ -190,42 +183,6 @@ class AplicacionPrincipal:
 
         menuBotonDistancia.pack(pady=5)
 
-        self.imagenDifuminada = ImageTk.PhotoImage(Image.new("RGB", (300, 300), "gray"))
-        self.labelImagenDifuminada = tk.Label(self.frameDistancia, image=self.imagenDifuminada, bg="#c9c9c9")
-        self.labelImagenDifuminada.pack(expand=True, fill='both', padx=10, pady=10)
-
-        # Información de distancia y botón
-        frameInfo = tk.Frame(self.frameSimulacion, bd=2, relief=tk.SUNKEN, padx=35, pady=15, bg="#e0e0e0")
-        frameInfo.pack(padx=10, pady=5, anchor='w')
-        """
-        self.labelCondicion = tk.Label(frameInfo, text="Condición: "+ self.condicion, bg="#e0e0e0")
-        self.labelCondicion.pack(anchor='w')
-        self.labelGrado = tk.Label(frameInfo, text= self.grado, bg="#e0e0e0")
-        self.labelGrado.pack(anchor='w')
-        self.labelDistancia = tk.Label(frameInfo, text="Distancia: "+ self.distancia, bg="#e0e0e0")
-        self.labelDistancia.pack(anchor='w')
-        self.labelPuntoCercano = tk.Label(frameInfo, text="Punto Cercano: "+ str(self.puntoCercano) +"[m]", bg="#e0e0e0")
-        self.labelPuntoCercano.pack(anchor='w')
-        self.labelPuntoLejano = tk.Label(frameInfo, text="Punto Lejano: "+ str(self.puntoLejano) +"[m]", bg="#e0e0e0")
-        self.labelPuntoLejano.pack(anchor='w')
-        self.labelLenteCorrectora = tk.Label(frameInfo, text="Lente correctora: "+ str(self.lenteCorrectora) +"[D]", bg="#e0e0e0")
-        self.labelLenteCorrectora.pack(anchor='w')
-        self.mostrarImagenes(self.index, self.gradoDeDifuminado)
-"""
-        self.labelCondicion = tk.Label(frameInfo, text="", bg="#e0e0e0")
-        self.labelCondicion.pack(anchor='w')
-        self.labelGrado = tk.Label(frameInfo, text= "", bg="#e0e0e0")
-        self.labelGrado.pack(anchor='w')
-        self.labelDistancia = tk.Label(frameInfo, text="", bg="#e0e0e0")
-        self.labelDistancia.pack(anchor='w')
-        self.labelPuntoCercano = tk.Label(frameInfo, text="", bg="#e0e0e0")
-        self.labelPuntoCercano.pack(anchor='w')
-        self.labelPuntoLejano = tk.Label(frameInfo, text="", bg="#e0e0e0")
-        self.labelPuntoLejano.pack(anchor='w')
-        self.labelLenteCorrectora = tk.Label(frameInfo, text="", bg="#e0e0e0")
-        self.labelLenteCorrectora.pack(anchor='w')
-        self.mostrarImagenes(self.index, self.gradoDeDifuminado)
-
         # Botón "Actualizar" en la esquina inferior derecha
         actualizarBoton = tk.Button(
             self.frameDistancia,
@@ -240,7 +197,119 @@ class AplicacionPrincipal:
         )
         actualizarBoton.pack(side='bottom', fill='x', padx=10, pady=15)
 
+        # Se crea el gráfico donde irá la marcha de rayos (simulación inicial en blanco)
+        fig, self.ax = plt.subplots(figsize=(4, 3))
+        self.ax.set_xticks([])  # Elimina las marcas del eje X
+        self.ax.set_yticks([])  # Elimina las marcas del eje Y
+        canvas = tkagg.FigureCanvasTkAgg(fig, master=self.frameGrado)
+        canvas.get_tk_widget().pack(pady=100)
+
+        # Información de selecciones
+        frameInfo = tk.Frame(self.frameSimulacion, bd=2, relief=tk.SUNKEN, padx=35, pady=15, bg="#e0e0e0")
+        frameInfo.pack(padx=10, pady=5, anchor='w')
+        self.labelCondicion = tk.Label(frameInfo, text="", bg="#e0e0e0")
+        self.labelCondicion.pack(anchor='w')
+        self.labelGrado = tk.Label(frameInfo, text= "", bg="#e0e0e0")
+        self.labelGrado.pack(anchor='w')
+        self.labelDistancia = tk.Label(frameInfo, text="", bg="#e0e0e0")
+        self.labelDistancia.pack(anchor='w')
+        self.labelPuntoCercano = tk.Label(frameInfo, text="", bg="#e0e0e0")
+        self.labelPuntoCercano.pack(anchor='w')
+        self.labelPuntoLejano = tk.Label(frameInfo, text="", bg="#e0e0e0")
+        self.labelPuntoLejano.pack(anchor='w')
+        self.labelLenteCorrectora = tk.Label(frameInfo, text="", bg="#e0e0e0")
+        self.labelLenteCorrectora.pack(anchor='w')
+
+        # Se ubica la imagen original
+        self.imagenOriginal = ImageTk.PhotoImage(Image.new("RGB", (300, 300), "gray"))
+        self.labelImagenOriginal = tk.Label(self.frameCondicion, image=self.imagenOriginal, bg="#c9c9c9")
+        self.labelImagenOriginal.pack(expand=True, fill='both', padx=10, pady=10)
+
+        # Se ubica la imagen difuminada
+        self.imagenDifuminada = ImageTk.PhotoImage(Image.new("RGB", (300, 300), "gray"))
+        self.labelImagenDifuminada = tk.Label(self.frameDistancia, image=self.imagenDifuminada, bg="#c9c9c9")
+        self.labelImagenDifuminada.pack(expand=True, fill='both', padx=10, pady=10)
+
+        # Se muestran las imagenes
+        self.mostrarImagenes(self.index, self.gradoDeDifuminado)
+
         # --- PESTAÑA DE PREGUNTAS ---
+        self.configuracionDePreguntas()
+
+        # --- PESTAÑA DE IMÁGENES (GALERÍA) ---
+        self.configuracionDeGaleria()
+
+    def mostrarImagen(self, index):
+        if index < len(directoriosImagenes):
+            print(f"Mostrando imagen {index}")
+            imagen_path = "\\RepositorioTIF\\Software\\TrabajoIntegradorFinal_Fisio\\imagenes_nuevas\\" + directoriosImagenes[index]
+            print(f"Ruta de la imagen: {imagen_path}")
+            imagen = gImagen.mostrar_imagen(imagen_path)
+            imagen = imagen.resize((300, 300))
+            self.imagenOriginal = ImageTk.PhotoImage(imagen)
+            self.labelImagenOriginal.config(image=self.imagenOriginal)
+            self.labelImagenOriginal.image = self.imagenOriginal
+
+    def mostrarImagenDifuminada(self, index, gradoDifuminacion):
+        if gradoDifuminacion > limiteDifuminacion:
+            gradoDifuminacion = limiteDifuminacion
+        if index < len(directoriosImagenes):
+            print(f"Mostrando imagen {index}")
+            imagen_path = "\\RepositorioTIF\\Software\\TrabajoIntegradorFinal_Fisio\\imagenes_nuevas\\" + directoriosImagenes[index]
+            print(f"Ruta de la imagen: {imagen_path}")
+            imagen = gImagen.mostrar_imagen(imagen_path)
+            imagen = imagen.resize((300, 300))
+            imagenDifuminada = imagen.filter(ImageFilter.GaussianBlur(radius=gradoDifuminacion))
+            self.imagenDifuminada = ImageTk.PhotoImage(imagenDifuminada)
+            self.labelImagenDifuminada.config(image=self.imagenDifuminada)
+            self.labelImagenDifuminada.image = self.imagenDifuminada
+
+    def mostrarImagenes(self, index, gradoDifuminacion):
+        self.mostrarImagen(index)
+        self.index = index
+        self.mostrarImagenDifuminada(index, gradoDifuminacion)
+
+    def mostrar_imagen_galeria(self):
+        datos = self.imagenes_galeria[self.galeria_index]
+        try:
+            ruta = f"\\RepositorioTIF\\Software\\TrabajoIntegradorFinal_Fisio\\imagenes\\{datos['archivo']}"
+            imagen = gImagen.mostrar_imagen(ruta)
+            # Obtiene el tamaño actual del label
+            w = self.galeria_img_label.winfo_width()
+            h = self.galeria_img_label.winfo_height()
+            # Si el label aún no tiene tamaño, usa un valor por defecto
+            if w < 50 or h < 50:
+                w, h = 1600, 1200
+          
+            img_tk = ImageTk.PhotoImage(imagen)
+        except Exception as e:
+            print(f"Error cargando imagen de galería: {e}")
+            img_tk = None
+
+        if img_tk:
+            self.galeria_img_label.config(image=img_tk, text="")
+            self.galeria_img_label.image = img_tk
+        else:
+            self.galeria_img_label.config(image="", text="Imagen no encontrada")
+            self.galeria_img_label.image = None
+
+        self.galeria_titulo_label.config(text=datos["titulo"])
+        self.galeria_desc_label.config(text=datos["descripcion"])
+
+    def redimensionar_imagen_galeria(self, event):
+        self.mostrar_imagen_galeria()
+
+    def galeria_anterior(self):
+        if self.galeria_index > 0:
+            self.galeria_index -= 1
+            self.mostrar_imagen_galeria()
+
+    def galeria_siguiente(self):
+        if self.galeria_index < len(self.imagenes_galeria) - 1:
+            self.galeria_index += 1
+            self.mostrar_imagen_galeria()
+
+    def configuracionDePreguntas(self):
         pregunta = tk.Label(self.framePreguntas, text="¿Cuál es la distancia focal del ojo humano emétrope?", bg="#f5f5f5", font=("Arial", 12))
         pregunta.pack(pady=20)
 
@@ -261,8 +330,8 @@ class AplicacionPrincipal:
                 messagebox.showinfo("Incorrecto", "Respuesta incorrecta.")
 
         tk.Button(self.framePreguntas, text="Verificar", command=verificar).pack(pady=20)
-
-        # --- PESTAÑA DE IMÁGENES (GALERÍA) ---
+    
+    def configuracionDeGaleria(self):
         self.imagenes_galeria = [
             {
                 "archivo": "manejar_emetrope.jpg",
@@ -315,74 +384,6 @@ class AplicacionPrincipal:
         self.frameGaleria.bind("<Configure>", self.redimensionar_imagen_galeria)
         self.galeria_img_label.bind("<Configure>", self.redimensionar_imagen_galeria)
 
-    def mostrarImagen(self, index):
-        if index < len(directoriosImagenes):
-            print(f"Mostrando imagen {index}")
-            imagen_path = "\\RepositorioTIF\\Software\\TrabajoIntegradorFinal_Fisio\\imagenes_nuevas\\" + directoriosImagenes[index]
-            print(f"Ruta de la imagen: {imagen_path}")
-            imagen = gImagen.mostrar_imagen(imagen_path)
-            imagen = imagen.resize((300, 300))
-            self.imagenOriginal = ImageTk.PhotoImage(imagen)
-            self.labelImagenOriginal.config(image=self.imagenOriginal)
-            self.labelImagenOriginal.image = self.imagenOriginal
-
-    def mostrarImagenDifuminada(self, index, grado):
-        if index < len(directoriosImagenes):
-            print(f"Mostrando imagen {index}")
-            imagen_path = "\\RepositorioTIF\\Software\\TrabajoIntegradorFinal_Fisio\\imagenes_nuevas\\" + directoriosImagenes[index]
-            print(f"Ruta de la imagen: {imagen_path}")
-            imagen = gImagen.mostrar_imagen(imagen_path)
-            imagen = imagen.resize((300, 300))
-            imagenDifuminada = imagen.filter(ImageFilter.GaussianBlur(radius=grado))
-            self.imagenDifuminada = ImageTk.PhotoImage(imagenDifuminada)
-            self.labelImagenDifuminada.config(image=self.imagenDifuminada)
-            self.labelImagenDifuminada.image = self.imagenDifuminada
-
-    def mostrarImagenes(self, index, grado):
-        self.mostrarImagen(index)
-        self.index = index
-        self.mostrarImagenDifuminada(index, grado)
-
-    def mostrar_imagen_galeria(self):
-        datos = self.imagenes_galeria[self.galeria_index]
-        try:
-            ruta = f"\\RepositorioTIF\\Software\\TrabajoIntegradorFinal_Fisio\\imagenes\\{datos['archivo']}"
-            imagen = gImagen.mostrar_imagen(ruta)
-            # Obtiene el tamaño actual del label
-            w = self.galeria_img_label.winfo_width()
-            h = self.galeria_img_label.winfo_height()
-            # Si el label aún no tiene tamaño, usa un valor por defecto
-            if w < 50 or h < 50:
-                w, h = 1600, 1200
-          
-            img_tk = ImageTk.PhotoImage(imagen)
-        except Exception as e:
-            print(f"Error cargando imagen de galería: {e}")
-            img_tk = None
-
-        if img_tk:
-            self.galeria_img_label.config(image=img_tk, text="")
-            self.galeria_img_label.image = img_tk
-        else:
-            self.galeria_img_label.config(image="", text="Imagen no encontrada")
-            self.galeria_img_label.image = None
-
-        self.galeria_titulo_label.config(text=datos["titulo"])
-        self.galeria_desc_label.config(text=datos["descripcion"])
-
-    def redimensionar_imagen_galeria(self, event):
-        self.mostrar_imagen_galeria()
-
-    def galeria_anterior(self):
-        if self.galeria_index > 0:
-            self.galeria_index -= 1
-            self.mostrar_imagen_galeria()
-
-    def galeria_siguiente(self):
-        if self.galeria_index < len(self.imagenes_galeria) - 1:
-            self.galeria_index += 1
-            self.mostrar_imagen_galeria()
-
     def actualizarValores(self):
         self.condicion = self.condicionSeleccionada.get()
         self.grado = self.gradoSeleccionado.get()
@@ -410,7 +411,7 @@ class AplicacionPrincipal:
             self.puntoCercano = emetropia.getPuntoCercano()
             self.puntoLejano = emetropia.getPuntoLejano()
             self.lenteCorrectora = 0
-            self.gradoDeDifuminado = 0
+            self.gradoDeDifuminado = emetropia.calcularRadioDeDifuminacion(float(self.distancia.replace(" m", "")))
 
         elif self.condicion == "Miope": # a mRayos se le pasa en orden condicion -> grado -> distancia
             miopia.setGrado(grado)
@@ -423,31 +424,7 @@ class AplicacionPrincipal:
             mRayos.setDistanciaObjeto(distancias.index(self.distancia))
 
             self.gradoDeDifuminado = miopia.calcularRadioDeDifuminacion(float(self.distancia.replace(" m", "")))
-            """
-            #Difuminado para grado 1
-            if grado == 1 and ((self.distancia == "0.25 m" or self.distancia == "0.33 m" or self.distancia == "0.50 m" or 
-                                    self.distancia == "1 m" )):
-                self.gradoDeDifuminado = 0
-            if grado == 1 and ((self.distancia == "0.10 m" or self.distancia == "2 m" or 
-                                    self.distancia == "10 m" )):
-                self.gradoDeDifuminado = miopia.calcularRadioDeDifuminacion()
-
-            #Difuminado para grado 2
-            if grado == 2 and ((self.distancia == "0.25 m" or self.distancia == "0.33 m" or self.distancia == "0.50 m" or 
-                                    self.distancia == "1 m" )):
-                self.gradoDeDifuminado = 0
-            if grado == 1 and ((self.distancia == "0.10 m" or self.distancia == "2 m" or 
-                                    self.distancia == "10 m" )):
-                self.gradoDeDifuminado = miopia.calcularRadioDeDifuminacion()
             
-            #Difuminado para grado 3
-            if grado == 1 and ((self.distancia == "0.25 m" or self.distancia == "0.33 m" or self.distancia == "0.50 m" or 
-                                    self.distancia == "1 m" )):
-                self.gradoDeDifuminado = 0
-            if grado == 1 and ((self.distancia == "0.10 m" or self.distancia == "2 m" or 
-                                    self.distancia == "10 m" )):
-                self.gradoDeDifuminado = miopia.calcularRadioDeDifuminacion()
-"""
         elif self.condicion == "Hipermétrope":
             hipermetropia.setGrado(grado)
             self.puntoCercano = hipermetropia.getPuntoCercano()
@@ -459,29 +436,7 @@ class AplicacionPrincipal:
             mRayos.setDistanciaObjeto(distancias.index(self.distancia))
 
             self.gradoDeDifuminado = hipermetropia.calcularRadioDeDifuminacion(float(self.distancia.replace(" m", "")))
-            """
-            #Difuminado para grado 1
-            if grado == 1 and (( self.distancia == "0.33 m" or self.distancia == "0.50 m" or 
-                                    self.distancia == "1 m" or self.distancia == "2 m" or self.distancia == "10 m" )):
-                self.gradoDeDifuminado = 0
-            if grado == 1 and ((self.distancia == "0.25 m" or self.distancia == "0.10 m"  )):
-                self.gradoDeDifuminado = miopia.calcularRadioDeDifuminacion()
 
-            #Difuminado para grado 2
-            if grado == 2 and ((self.distancia == "0.10 m" or self.distancia == "0.25 m" or self.distancia == "0.50 m" or 
-                                    self.distancia == "0.33 m" or self.distancia == "0.50 m"  )):
-                self.gradoDeDifuminado = hipermetropia.calcularRadioDeDifuminacion()
-            if grado == 2 and ((self.distancia == "1 m" or self.distancia == "2 m" or 
-                                    self.distancia == "10 m" )):
-                self.gradoDeDifuminado = 0
-
-            #Difuminado para grado 3
-            if grado == 2 and ((self.distancia == "0.10 m" or self.distancia == "0.25 m" or self.distancia == "0.50 m" or 
-                                    self.distancia == "0.33 m" or self.distancia == "0.50 m" or self.distancia == "1 m" )):
-                self.gradoDeDifuminado = hipermetropia
-            if grado == 3 and ((self.distancia == "2 m" or self.distancia == "10 m" )):
-                self.gradoDeDifuminado = 0
-"""
         self.ax.clear()
         mRayos.dibujarSimulacion(self.ax)
 

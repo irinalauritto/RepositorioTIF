@@ -7,9 +7,10 @@ import matplotlib.backends.backend_tkagg as tkagg  # Para integrar gráficos de 
 from matplotlib.patches import Ellipse
 
 tamanoLegends = 6  # Tamaño de las leyendas en el gráfico
-Distancias = ["0.10 m","0.25 m", "0.33 m", "0.50 m", "1 m", "2 m", "10 m"] # Vector original, el que selecciona el usuario
-distancias = [100, 200, 400, 500, 650, 800, 1000] # Vector de distancias con el que trabaja la marcha de rayos
+Distancias = ["0.10 m","0.25 m", "0.33 m", "0.50 m", "1 m", "2 m", "10 m", "15 m"] # Vector original, el que selecciona el usuario
+distancias = [100, 200, 400, 500, 650, 800, 1000, 1400] # Vector de distancias con el que trabaja la marcha de rayos
                                               # Verificar que la cantidad de elementos sea la misma en ambos vectores
+ultimaDistancia = 7
 puntoProximoEmetrope = distancias[1]  # Punto proximo del ojo emétrope
 puntoLejanoEmetrope = distancias[6]  # Punto lejano
 
@@ -19,12 +20,7 @@ class MarchaDeRayos:
         self.nombre = nombre
         self.ax = None  # Inicializar el eje como None
         self.alturaObjeto = 100 #mm
-        #self.distanciaImagen = 25 #mm
         self.diametroOjo = 500 #mm Tamaño del ojo (fijo!!!)
-        #self.infinito = self.distanciaFocal*2000
-        #self.distanciaObjetoMin = puntoProximo #mm
-        #self.distanciaObjetoMax = puntoLejano #mm  
-        #self.distanciaObjeto = 0  # Inicializar la distancia del objeto
 
     def setCondicion(self, condicion):
         """
@@ -46,25 +42,37 @@ class MarchaDeRayos:
             self.distanciaObjetoMin = puntoProximoEmetrope
             self.distanciaObjetoMax = puntoLejanoEmetrope
         elif self.condicion == "Miope": # Si es miope
+            """
             if grado == 6:  # Si el grado es 6
-                self.distanciaObjetoMin = puntoProximoEmetrope*0.5  
-                self.distanciaObjetoMax = puntoLejanoEmetrope*0.7
+                self.distanciaObjetoMin = puntoProximoEmetrope*0.4  
+                self.distanciaObjetoMax = puntoLejanoEmetrope*0.016
             elif grado == 3:  # Si el grado es 3
-                self.distanciaObjetoMin = puntoProximoEmetrope*0.6  
-                self.distanciaObjetoMax = puntoLejanoEmetrope*0.8
+                self.distanciaObjetoMin = puntoProximoEmetrope*0.56  
+                self.distanciaObjetoMax = puntoLejanoEmetrope*0.032
             elif grado == 1:  # Si el grado es 1
-                self.distanciaObjetoMin = puntoProximoEmetrope*0.7  
-                self.distanciaObjetoMax = puntoLejanoEmetrope*0.9
-        elif self.condicion == "Hipermétrope": # Si es hipermetrope
-            if grado == 6:  # Si el grado es 6
-                self.distanciaObjetoMin = puntoProximoEmetrope*1.3  
-                self.distanciaObjetoMax = puntoLejanoEmetrope*1.3
-            if grado == 3:  # Si el grado es 3
-                self.distanciaObjetoMin = puntoProximoEmetrope*1.2  
-                self.distanciaObjetoMax = puntoLejanoEmetrope*1.2
+                self.distanciaObjetoMin = puntoProximoEmetrope*0.8  
+                self.distanciaObjetoMax = puntoLejanoEmetrope*0.091
+            """
             if grado == 1:  # Si el grado es 1
-                self.distanciaObjetoMin = puntoProximoEmetrope*1.1  
-                self.distanciaObjetoMax = puntoLejanoEmetrope*1.1
+                self.distanciaObjetoMin = distancias[1]*0.8  
+                self.distanciaObjetoMax = distancias[4]*0.91
+            elif grado == 3:  # Si el grado es 3
+                self.distanciaObjetoMin = distancias[1]*0.56  
+                self.distanciaObjetoMax = distancias[2]
+            elif grado == 6:  # Si el grado es 6
+                self.distanciaObjetoMin = distancias[0] 
+                self.distanciaObjetoMax = distancias[1]*0.64
+                
+        elif self.condicion == "Hipermétrope": # Si es hipermetrope
+            if grado == 1:  # Si el grado es 1
+                self.distanciaObjetoMin = distancias[2]  
+                self.distanciaObjetoMax = puntoLejanoEmetrope*1.2
+            if grado == 3:  # Si el grado es 3
+                self.distanciaObjetoMin = distancias[4]  
+                self.distanciaObjetoMax = puntoLejanoEmetrope*2
+            if grado == 6:  # Si el grado es 6
+                self.distanciaObjetoMin = distancias[5] 
+                self.distanciaObjetoMax = puntoLejanoEmetrope*3
 
     def setDistanciaObjeto(self, distanciaObjeto):
         """
@@ -105,7 +113,7 @@ class MarchaDeRayos:
     def dibujarSimulacion(self,ax):
         self.ax = ax
         self.ax.clear()  # Limpia el gráfico actual
-        self.ax.set_xlim(-puntoLejanoEmetrope*1.3, 550)  # Establece los límites del eje X
+        self.ax.set_xlim(-distancias[ultimaDistancia]*1.2, 550)  # Establece los límites del eje X
         self.ax.set_ylim(-600, 600)  # Establece los límites del eje Y
         self.ax.set_aspect('equal', adjustable='box')  # Asegura que los ejes tengan la misma escala
         self.ax.set_xticks([])  # Elimina las marcas del eje X

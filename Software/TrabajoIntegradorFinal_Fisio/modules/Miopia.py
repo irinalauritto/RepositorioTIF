@@ -14,10 +14,10 @@ class Miopia(VicioDeRefraccion):
             grado(str): degree of the patology.
         """
         super().__init__(nombre, grado)
-        self.lenteCorrectora = self.definirLenteCorrectora()
-        self.puntoCercano = self.calcularPuntoCercano()
-        self.puntoLejano = self.calcularPuntoLejano()
-        self.diametroOjo = 0.025  # [m] Tamaño del ojo (fijo!!!)
+        self.definirLenteCorrectora()
+        self.calcularPuntoCercano()
+        self.calcularPuntoLejano()
+        self.diametroOjo = 0.025  # [m]
     
     # Funciones de la clase
     def setGrado(self, grado):
@@ -28,11 +28,11 @@ class Miopia(VicioDeRefraccion):
             grado(str): degree of the patology.
         """
         self.grado = grado
-        self.lenteCorrectora = self.definirLenteCorrectora()
-        self.puntoCercano = self.calcularPuntoCercano()
-        self.puntoLejano = self.calcularPuntoLejano()
+        self.definirLenteCorrectora()
+        self.calcularPuntoCercano()
+        self.calcularPuntoLejano()
     
-    def definirLenteCorrectora(self): #Definimos 1,3, y 6 a los grados leve, moderado y severos, rspectivamente.
+    def definirLenteCorrectora(self): # Definimos 1,3, y 6 a los grados leve, moderado y severos, respectivamente.
         if self.grado == 1:
             self.dioptriasLenteCorrectora = 1.00
         elif self.grado == 3:
@@ -43,49 +43,35 @@ class Miopia(VicioDeRefraccion):
     def calcularPuntoCercano(self): ##Las dioptrias del lente para miopia son negativas, por lo que queda sumando en la formula.
         """
         Calculates the near point.
-
-        Returns:
-            float: near point.
         """
-        return round(1/((1/0.25)+self.dioptriasLenteCorrectora), 2) # [m]
+        self.puntoCercano = round(1/((1/0.25)+self.dioptriasLenteCorrectora), 2) # [m]
     
-    def calcularPuntoLejano(self): ##Las dioptrias del lente para miopia son negativas, por lo que queda sumando en la formula.
-        
-        return round(1/((1/10)+self.dioptriasLenteCorrectora), 2) # [m]
+    def calcularPuntoLejano(self): # Las dioptrias del lente para miopia son negativas, por lo que queda sumando en la formula.
+        self.puntoLejano = round(1/((1/10)+self.dioptriasLenteCorrectora), 2) # [m]
     
     def calcularRadioDeDifuminacion(self, distanciaObjeto):  
         """
         Calculates the radius of the blur circle.
-
-        Returns:
-            float: radius of the blur circle.
         """
-        self.DistanciaFocal = self.calcularDistanciaFocal(distanciaObjeto)
+        self.calcularDistanciaFocal(distanciaObjeto)
 
-        distanciaImagen = 1 / (1 / self.DistanciaFocal - 1 / distanciaObjeto)  # Calcula la distancia de la imagen
-        
-        if distanciaImagen < self.diametroOjo:  # Si la imagen se forma dentro del ojo
-            return self.diametroOjo / distanciaImagen
-        if distanciaImagen > self.diametroOjo:  # Si la imagen se forma fuera del ojo
-            return distanciaImagen / self.diametroOjo
-        if distanciaImagen == self.diametroOjo:  # Si la imagen se forma en la retina
+        if distanciaObjeto > self.puntoLejano:
+            return distanciaObjeto/self.puntoLejano
+        if self.puntoLejano >= distanciaObjeto and distanciaObjeto >= self.puntoCercano:
             return 0
-        
+        if self.puntoCercano > distanciaObjeto:
+            return self.puntoCercano/distanciaObjeto
+
     def calcularDistanciaFocal(self, distanciaObjeto):  
         """
         Calculates the focal distance.
-
-        Returns:
-            float: focal distance.
         """
         if self.puntoCercano <= distanciaObjeto and distanciaObjeto <= self.puntoLejano: # Si se encuentra entre el pto lejano y proximo
             self.distanciaFocal = 1/(1/distanciaObjeto+1/self.diametroOjo)     # El ojo ajusta su potencia para ubicar la imagen en la retina (acomodacion)
         if distanciaObjeto < self.puntoCercano:                      # Si el objeto esta dentro del punto proximo
             self.distanciaFocal = 1/(1/self.puntoCercano+1/self.diametroOjo) # La potencia del ojo es la maxima que puede lograr (correspondida a la distancia minima a la que puede ver claramente un objeto)
         if  self.puntoLejano < distanciaObjeto:                     # Si el objeto esta mas alla del punto lejano
-            self.distanciaFocal = 1/(1/self.puntoLejano+1/self.diametroOjo) # La potencia del ojo es la minima que puede lograr (correspondida a la distancia maxima a la que puede ver claramente un objeto)
-        
-        return self.distanciaFocal          
+            self.distanciaFocal = 1/(1/self.puntoLejano+1/self.diametroOjo) # La potencia del ojo es la minima que puede lograr (correspondida a la distancia maxima a la que puede ver claramente un objeto)         
 
     ### Getters ###
     def getPuntoCercano(self):
@@ -104,14 +90,14 @@ class Miopia(VicioDeRefraccion):
             float: far point.
         """
         return self.puntoLejano
-    def getLenteCorrectora(self):
+    def getDioptriasLenteCorrectora(self):
         """
         Returns the corrective lens of the eye.
         
         Returns:
             float: corrective lens.
         """
-        return self.lenteCorrectora
+        return -self.dioptriasLenteCorrectora
     def getRadioDifuminacion(self):
         """
         Returns the radius of the blur circle.
@@ -126,6 +112,3 @@ class Miopia(VicioDeRefraccion):
         Returns the focal distance of the eye.
         """ 
         return self.distanciaFocal
-    
-    #def getDioptriasLenteCorrectora(self):
-    #    return super().getDioptriasLenteCorrectora() # Aca no sería return self.dioptriasLenteCorrectora ???
