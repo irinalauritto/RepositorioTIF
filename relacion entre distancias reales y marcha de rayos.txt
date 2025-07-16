@@ -1,0 +1,49 @@
+EMETROPE OK!
+	PC: 0.25
+	PL: 10
+
+MIOPE
+GRADO 1 
+	PC: 0.2		-->	0.8
+	PL: 0.91	-->	0.091
+GRADO 2
+	PC: 0.14	-->	0.56
+	PL: 0.32	-->	0.032
+GRADO 3
+	PC: 0.1 	-->	0.4
+	PL: 0.16 	-->	0.016
+
+HIPERMETROPE
+GRADO 1
+	PC: 0.33 	-->	1.32
+	PL: 12  	-->	1.2
+GRADO 2
+	PC: 1 	   	-->	 4
+	PL: 20  	-->	2
+GRADO 3
+	PC: 2   	-->	8
+	PL: 30  	-->	3
+
+
+___________________________________________________________________________________
+MIOPE
+GRADO 1 
+	PC: 0.2		-->	distancias[1]*0.8
+	PL: 0.91	-->	distancias[4]*0.91
+GRADO 2
+	PC: 0.14	-->	distancias[1]*0.56
+	PL: 0.32	-->	distancias[2]
+GRADO 3
+	PC: 0.1 	-->	distancias[0]
+	PL: 0.16 	-->	distancias[1]*0.64
+
+HIPERMETROPE
+GRADO 1
+	PC: 0.33 	-->	distancias[2]
+	PL: 12  	-->	distancias[7]*0.8
+GRADO 2
+	PC: 1 	   	-->	distancias[4]
+	PL: 20  	-->	distancias[7]*4/3
+GRADO 3
+	PC: 2   	-->	distancias[5]
+	PL: 30  	-->	distancias[7]*2
