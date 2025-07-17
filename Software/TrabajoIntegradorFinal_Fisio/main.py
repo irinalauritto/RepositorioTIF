@@ -25,7 +25,7 @@ from apps.app_principal import ejecutar_gui
 
 def main():
     """Punto de entrada principal."""
-    print("Iniciando la aplicación GUI...")
+    print("Iniciando la aplicación GUI...") 
     ejecutar_gui()
 
 if __name__ == "__main__":

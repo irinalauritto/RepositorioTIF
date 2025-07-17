@@ -11,6 +11,7 @@ import modules.Hipermetropia as h
 import modules.Miopia as m
 import modules.Emetropia as e
 from tkinter import ttk
+import random
 
 # Creacion de objetos
 gArchivos = ga.gestorDeArchivos("Gestor de Archivos")
@@ -313,27 +314,143 @@ class AplicacionPrincipal:
             self.mostrar_imagen_galeria()
 
     def configuracionDePreguntas(self):
-        pregunta = tk.Label(self.framePreguntas, text="¿Cuál es la distancia focal del ojo humano emétrope?", bg="#f5f5f5", font=("Arial", 12))
-        pregunta.pack(pady=20)
-
-        opciones = [
-            "A) 250 mm",
-            "B) 500 mm",
-            "C) 100 mm",
-            "D) 10 mm"
+        # Banco de preguntas
+        banco_preguntas = [
+            {
+                "pregunta": "¿Cuál es la distancia focal del ojo humano emétrope?",
+                "opciones": [
+                    "A) 25 cm",
+                    "B) 50 cm",
+                    "C) 10 cm",
+                    "D) 1 cm"
+                ],
+                "respuesta": "A"
+            },
+            {
+                "pregunta": "¿Qué lente corrige la miopía?",
+                "opciones": [
+                    "A) Lente convergente",
+                    "B) Lente divergente",
+                    "C) Lente bifocal",
+                    "D) Lente cilíndrica"
+                ],
+                "respuesta": "B"
+            },
+            {
+                "pregunta": "¿Cuál es el punto lejano de un ojo miope sin corregir?",
+                "opciones": [
+                    "A) Infinito",
+                    "B) 50 m",
+                    "C) Menor que infinito",
+                    "D) Mayor que infinito"
+                ],
+                "respuesta": "C"
+            },
+            {
+                "pregunta": "¿Qué es la hipermetropía?",
+                "opciones": [
+                    "A) Dificultad para ver de lejos",
+                    "B) Dificultad para ver de cerca",
+                    "C) Visión doble",
+                    "D) Visión borrosa solo de noche"
+                ],
+                "respuesta": "B"
+            },
+            {
+                "pregunta": "¿Qué lente corrige la hipermetropía?",
+                "opciones": [
+                    "A) Lente divergente",
+                    "B) Lente convergente",
+                    "C) Lente bifocal",
+                    "D) Lente cilíndrica"
+                ],
+                "respuesta": "B"
+            },
+            {
+                "pregunta": "¿Qué significa emetropía?",
+                "opciones": [
+                    "A) Condición oftalmológica ideal",
+                    "B) Dificultad para ver de lejos",
+                    "C) Dificultad para ver de cerca",
+                    "D) Visión borrosa"
+                ],
+                "respuesta": "A"
+            },
+            {
+                "pregunta": "¿Cuál es el punto cercano típico de un ojo sano?",
+                "opciones": [
+                    "A) 10 cm",
+                    "B) 25 cm",
+                    "C) 50 cm",
+                    "D) 1 m"
+                ],
+                "respuesta": "B"
+            },
+            {
+                "pregunta": "¿Qué unidad se usa para medir la potencia de una lente?",
+                "opciones": [
+                    "A) Metro",
+                    "B) Dioptría",
+                    "C) Milímetro",
+                    "D) Grado"
+                ],
+                "respuesta": "B"
+            }
+            
         ]
-        self.respuesta = tk.StringVar()
-        for opcion in opciones:
-            tk.Radiobutton(self.framePreguntas, text=opcion, variable=self.respuesta, value=opcion, bg="#f5f5f5").pack(anchor='w', padx=40)
 
-        def verificar():
-            if self.respuesta.get().startswith("A"):
+        # Selecciona 3 preguntas al azar y en orden aleatorio
+        self.preguntas = random.sample(banco_preguntas, 3)
+
+        self.respuestas_usuario = [tk.StringVar() for _ in self.preguntas]
+        self.resultados = [None for _ in self.preguntas]
+
+        def verificar_individual(idx):
+            correcta = self.preguntas[idx]["respuesta"]
+            seleccion = self.respuestas_usuario[idx].get()
+            if seleccion == correcta:
                 messagebox.showinfo("Correcto", "¡Respuesta correcta!")
+                self.resultados[idx] = True
             else:
                 messagebox.showinfo("Incorrecto", "Respuesta incorrecta.")
+                self.resultados[idx] = False
 
-        tk.Button(self.framePreguntas, text="Verificar", command=verificar).pack(pady=20)
-    
+        # Limpia el frame antes de agregar widgets (por si se llama más de una vez)
+        for widget in self.framePreguntas.winfo_children():
+            widget.destroy()
+
+        # Mostrar todas las preguntas
+        for idx, pregunta in enumerate(self.preguntas):
+            frame_preg = tk.Frame(self.framePreguntas, bg="#f5f5f5", bd=2, relief=tk.GROOVE)
+            frame_preg.pack(padx=10, pady=10, fill="x")
+
+            tk.Label(frame_preg, text=f"{idx+1}. {pregunta['pregunta']}", bg="#f5f5f5", font=("Arial", 12)).pack(anchor="w", pady=(5, 2))
+
+            for opcion in pregunta["opciones"]:
+                tk.Radiobutton(
+                    frame_preg,
+                    text=opcion,
+                    variable=self.respuestas_usuario[idx],
+                    value=opcion[0],  # "A", "B", etc.
+                    bg="#f5f5f5"
+                ).pack(anchor="w", padx=30)
+
+            tk.Button(
+                frame_preg,
+                text="Verificar",
+                command=lambda i=idx: verificar_individual(i)
+            ).pack(anchor="e", pady=5)
+
+        def calificar():
+            correctas = 0
+            total = len(self.preguntas)
+            for idx, pregunta in enumerate(self.preguntas):
+                if self.respuestas_usuario[idx].get() == pregunta["respuesta"]:
+                    correctas += 1
+            messagebox.showinfo("Calificación", f"Respuestas correctas: {correctas} de {total}\nNota: {round(correctas/total*10, 2)}/10")
+
+        tk.Button(self.framePreguntas, text="Calificar", command=calificar, bg="#3b82f6", fg="white", font=("Arial", 12, "bold")).pack(pady=20)
+
     def configuracionDeGaleria(self):
         self.imagenes_galeria = [
             {
