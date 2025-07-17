@@ -314,7 +314,8 @@ class AplicacionPrincipal:
             self.mostrar_imagen_galeria()
 
     def configuracionDePreguntas(self):
-        # Banco de preguntas
+        import tkinter.font as tkFont
+        # Banco de preguntas (puedes agregar más)
         banco_preguntas = [
             {
                 "pregunta": "¿Cuál es la distancia focal del ojo humano emétrope?",
@@ -396,44 +397,67 @@ class AplicacionPrincipal:
                 ],
                 "respuesta": "B"
             }
-            
         ]
 
         # Selecciona 3 preguntas al azar y en orden aleatorio
         self.preguntas = random.sample(banco_preguntas, 3)
 
-        self.respuestas_usuario = [tk.StringVar() for _ in self.preguntas]
+        # Limpia el frame antes de agregar widgets
+        for widget in self.framePreguntas.winfo_children():
+            widget.destroy()
+
+        self.respuestas_usuario = [tk.StringVar(value="") for _ in self.preguntas]
         self.resultados = [None for _ in self.preguntas]
+        self.marcadores = []  # Para los labels de tick/cruz
+
+        pregunta_frames = []
 
         def verificar_individual(idx):
             correcta = self.preguntas[idx]["respuesta"]
             seleccion = self.respuestas_usuario[idx].get()
-            if seleccion == correcta:
-                messagebox.showinfo("Correcto", "¡Respuesta correcta!")
-                self.resultados[idx] = True
-            else:
-                messagebox.showinfo("Incorrecto", "Respuesta incorrecta.")
-                self.resultados[idx] = False
-
-        # Limpia el frame antes de agregar widgets (por si se llama más de una vez)
-        for widget in self.framePreguntas.winfo_children():
-            widget.destroy()
+            # Limpia todos los marcadores antes de marcar
+            for lbl in self.marcadores[idx]:
+                lbl.config(text="")
+            if seleccion == "":
+                return  # No marcar nada si no eligió
+            for i, opcion in enumerate(self.preguntas[idx]["opciones"]):
+                letra = opcion[0]
+                if seleccion == letra:
+                    if seleccion == correcta:
+                        self.marcadores[idx][i].config(text="✔️", fg="green")
+                        self.resultados[idx] = True
+                    else:
+                        self.marcadores[idx][i].config(text="❌", fg="red")
+                        self.resultados[idx] = False
+                elif letra == correcta and seleccion != correcta:
+                    self.marcadores[idx][i].config(text="✔️", fg="green")
 
         # Mostrar todas las preguntas
         for idx, pregunta in enumerate(self.preguntas):
             frame_preg = tk.Frame(self.framePreguntas, bg="#f5f5f5", bd=2, relief=tk.GROOVE)
             frame_preg.pack(padx=10, pady=10, fill="x")
+            pregunta_frames.append(frame_preg)
 
             tk.Label(frame_preg, text=f"{idx+1}. {pregunta['pregunta']}", bg="#f5f5f5", font=("Arial", 12)).pack(anchor="w", pady=(5, 2))
 
-            for opcion in pregunta["opciones"]:
-                tk.Radiobutton(
-                    frame_preg,
+            marcadores_opciones = []
+            opciones_frame = tk.Frame(frame_preg, bg="#f5f5f5")
+            opciones_frame.pack(anchor="w")
+            for i, opcion in enumerate(pregunta["opciones"]):
+                subframe = tk.Frame(opciones_frame, bg="#f5f5f5")
+                subframe.pack(anchor="w")
+                rb = tk.Radiobutton(
+                    subframe,
                     text=opcion,
                     variable=self.respuestas_usuario[idx],
                     value=opcion[0],  # "A", "B", etc.
                     bg="#f5f5f5"
-                ).pack(anchor="w", padx=30)
+                )
+                rb.pack(side="left")
+                lbl = tk.Label(subframe, text="", bg="#f5f5f5", font=("Arial", 14, "bold"))
+                lbl.pack(side="left", padx=10)
+                marcadores_opciones.append(lbl)
+            self.marcadores.append(marcadores_opciones)
 
             tk.Button(
                 frame_preg,
@@ -441,13 +465,18 @@ class AplicacionPrincipal:
                 command=lambda i=idx: verificar_individual(i)
             ).pack(anchor="e", pady=5)
 
+        # Calificación
+        self.calificacion_label = tk.Label(self.framePreguntas, text="", bg="#f5f5f5", font=("Arial", 14, "bold"))
+        self.calificacion_label.pack(pady=10)
+
         def calificar():
             correctas = 0
             total = len(self.preguntas)
             for idx, pregunta in enumerate(self.preguntas):
                 if self.respuestas_usuario[idx].get() == pregunta["respuesta"]:
                     correctas += 1
-            messagebox.showinfo("Calificación", f"Respuestas correctas: {correctas} de {total}\nNota: {round(correctas/total*10, 2)}/10")
+            nota = round(correctas / total * 10, 2)
+            self.calificacion_label.config(text=f"Respuestas correctas: {correctas} de {total}   Nota: {nota}/10")
 
         tk.Button(self.framePreguntas, text="Calificar", command=calificar, bg="#3b82f6", fg="white", font=("Arial", 12, "bold")).pack(pady=20)
 
