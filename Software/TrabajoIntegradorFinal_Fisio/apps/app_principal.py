@@ -114,8 +114,9 @@ class AplicacionPrincipal:
 
         # Se ubican los frames en el grid
         self.frameCondicion.grid(row=0, column=0, padx=10, sticky='nsew')
-        self.frameGrado.grid(row=0, column=1, padx=20, sticky='nsew')
+        self.frameGrado.grid(row=0, column=1, padx=10, sticky='nsew')
         self.frameDistancia.grid(row=0, column=2, padx=10, sticky='nsew')
+        self.frameDistancia.rowconfigure(0, weight=1)  # <-- Agrega esto
         
         # Botón de condición
         self.frameCondicion = tk.Frame(self.frameGrid, bg="#c9c9c9")
@@ -176,6 +177,7 @@ class AplicacionPrincipal:
         # Botón de distancia
         self.frameDistancia = tk.Frame(self.frameGrid, bg="#c9c9c9")
         self.frameDistancia.grid(row=0, column=2, padx=10, sticky='nsew')
+        self.frameDistancia.rowconfigure(0, weight=1)  # <-- Agrega esto
         self.distanciaSeleccionada = tk.StringVar(self.root)
         self.distanciaSeleccionada.set("0.25 m")
 
@@ -198,9 +200,54 @@ class AplicacionPrincipal:
 
         menuBotonDistancia.pack(pady=5)
 
-        # Botón "Actualizar" en la esquina inferior derecha
+        # Se crea el gráfico donde irá la marcha de rayos (simulación inicial en blanco)
+        fig, self.ax = plt.subplots(figsize=(7, 5))
+        self.ax.set_xticks([])  # Elimina las marcas del eje X
+        self.ax.set_yticks([])  # Elimina las marcas del eje Y
+        canvas = tkagg.FigureCanvasTkAgg(fig, master=self.frameGrado)
+        canvas.get_tk_widget().pack(pady=100)
+
+        # Configura una nueva fila para info
+        self.frameGrid.rowconfigure(1, weight=0)  # Fila para info, no se expande tanto como la de imágenes
+
+        # Crea frameInfo y ubícalo en el grid, columna central (debajo de frameGrado)
+        self.frameInfo = tk.Frame(self.frameGrid, bd=2, relief=tk.SUNKEN, padx=25, pady=10, bg="#e0e0e0")
+        self.frameInfo.grid(row=3, column=0, padx=20, pady=(10, 20), sticky='ew')
+
+        # Labels dentro de frameInfo
+        self.labelCondicion = tk.Label(self.frameInfo, text="Seleccione condición", bg="#e0e0e0")
+        self.labelCondicion.pack(anchor='w')
+        self.labelGrado = tk.Label(self.frameInfo, text= "", bg="#e0e0e0")
+        self.labelGrado.pack(anchor='w')
+        self.labelDistancia = tk.Label(self.frameInfo, text="Distancia: ", bg="#e0e0e0")
+        self.labelDistancia.pack(anchor='w')
+        self.labelPuntoCercano = tk.Label(self.frameInfo, text="Punto cercano: ", bg="#e0e0e0")
+        self.labelPuntoCercano.pack(anchor='w')
+        self.labelPuntoLejano = tk.Label(self.frameInfo, text="Punto lejano: ", bg="#e0e0e0")
+        self.labelPuntoLejano.pack(anchor='w')
+        self.labelLenteCorrectora = tk.Label(self.frameInfo, text="Lente correctora: ", bg="#e0e0e0")
+        self.labelLenteCorrectora.pack(anchor='w')
+
+       
+        # Se ubica la imagen original
+        self.imagenOriginal = ImageTk.PhotoImage(Image.new("RGB", (400, 500), "gray"))
+        self.labelImagenOriginal = tk.Label(self.frameCondicion, image=self.imagenOriginal, bg="#c9c9c9")
+        self.labelImagenOriginal.pack(expand=True, fill='both', padx=10, pady=10)
+
+        # Se ubica la imagen difuminada
+        self.imagenDifuminada = ImageTk.PhotoImage(Image.new("RGB", (400, 500), "gray"))
+        self.labelImagenDifuminada = tk.Label(self.frameDistancia, image=self.imagenDifuminada, bg="#c9c9c9")
+        self.labelImagenDifuminada.pack(expand=True, fill='both', padx=10, pady=10)
+
+        # Se muestran las imagenes
+        self.mostrarImagenes(self.index, self.gradoDeDifuminado)
+
+        # Nuevo frame para el botón debajo de la imagen difuminada
+        self.frameActualizar = tk.Frame(self.frameGrid, bg="#c9c9c9")
+        self.frameActualizar.grid(row=3, column=2, padx=10, pady=(0,20), sticky='nsew')
+
         actualizarBoton = tk.Button(
-            self.frameDistancia,
+            self.frameActualizar,
             text="Actualizar",
             command=self.actualizarValores,
             relief=tk.RAISED,
@@ -208,45 +255,9 @@ class AplicacionPrincipal:
             font=boton_fuente,
             padx=20,
             pady=10,
-            width=12
+            width=10
         )
-        actualizarBoton.pack(side='bottom', fill='x', padx=10, pady=15)
-
-        # Se crea el gráfico donde irá la marcha de rayos (simulación inicial en blanco)
-        fig, self.ax = plt.subplots(figsize=(4, 3))
-        self.ax.set_xticks([])  # Elimina las marcas del eje X
-        self.ax.set_yticks([])  # Elimina las marcas del eje Y
-        canvas = tkagg.FigureCanvasTkAgg(fig, master=self.frameGrado)
-        canvas.get_tk_widget().pack(pady=100)
-
-        # Información de selecciones
-        frameInfo = tk.Frame(self.frameSimulacion, bd=2, relief=tk.SUNKEN, padx=35, pady=15, bg="#e0e0e0")
-        frameInfo.pack(padx=10, pady=5, anchor='w')
-        self.labelCondicion = tk.Label(frameInfo, text="Seleccione condición", bg="#e0e0e0")
-        self.labelCondicion.pack(anchor='w')
-        self.labelGrado = tk.Label(frameInfo, text= "", bg="#e0e0e0")
-        self.labelGrado.pack(anchor='w')
-        self.labelDistancia = tk.Label(frameInfo, text="Distancia: ", bg="#e0e0e0")
-        self.labelDistancia.pack(anchor='w')
-        self.labelPuntoCercano = tk.Label(frameInfo, text="Punto cercano: ", bg="#e0e0e0")
-        self.labelPuntoCercano.pack(anchor='w')
-        self.labelPuntoLejano = tk.Label(frameInfo, text="Punto lejano: ", bg="#e0e0e0")
-        self.labelPuntoLejano.pack(anchor='w')
-        self.labelLenteCorrectora = tk.Label(frameInfo, text="Lente correctora: ", bg="#e0e0e0")
-        self.labelLenteCorrectora.pack(anchor='w')
-
-        # Se ubica la imagen original
-        self.imagenOriginal = ImageTk.PhotoImage(Image.new("RGB", (300, 300), "gray"))
-        self.labelImagenOriginal = tk.Label(self.frameCondicion, image=self.imagenOriginal, bg="#c9c9c9")
-        self.labelImagenOriginal.pack(expand=True, fill='both', padx=10, pady=10)
-
-        # Se ubica la imagen difuminada
-        self.imagenDifuminada = ImageTk.PhotoImage(Image.new("RGB", (300, 300), "gray"))
-        self.labelImagenDifuminada = tk.Label(self.frameDistancia, image=self.imagenDifuminada, bg="#c9c9c9")
-        self.labelImagenDifuminada.pack(expand=True, fill='both', padx=10, pady=10)
-
-        # Se muestran las imagenes
-        self.mostrarImagenes(self.index, self.gradoDeDifuminado)
+        actualizarBoton.pack(expand=True, pady=10)
 
     def mostrarImagen(self, index):
         if index < len(directoriosImagenes):
@@ -254,7 +265,7 @@ class AplicacionPrincipal:
             imagen_path = "\\RepositorioTIF\\Software\\TrabajoIntegradorFinal_Fisio\\imagenes_nuevas\\" + directoriosImagenes[index]
             print(f"Ruta de la imagen: {imagen_path}")
             imagen = gImagen.mostrar_imagen(imagen_path)
-            imagen = imagen.resize((300, 300))
+            imagen = imagen.resize((400, 500))
             self.imagenOriginal = ImageTk.PhotoImage(imagen)
             self.labelImagenOriginal.config(image=self.imagenOriginal)
             self.labelImagenOriginal.image = self.imagenOriginal
@@ -267,7 +278,7 @@ class AplicacionPrincipal:
             imagen_path = "\\RepositorioTIF\\Software\\TrabajoIntegradorFinal_Fisio\\imagenes_nuevas\\" + directoriosImagenes[index]
             print(f"Ruta de la imagen: {imagen_path}")
             imagen = gImagen.mostrar_imagen(imagen_path)
-            imagen = imagen.resize((300, 300))
+            imagen = imagen.resize((400, 500))
             imagenDifuminada = imagen.filter(ImageFilter.GaussianBlur(radius=gradoDifuminacion))
             self.imagenDifuminada = ImageTk.PhotoImage(imagenDifuminada)
             self.labelImagenDifuminada.config(image=self.imagenDifuminada)
@@ -658,6 +669,7 @@ class AplicacionPrincipal:
     
 def ejecutar_gui():
     root = tk.Tk()
+    root.state('zoomed')  # Maximiza la ventana al iniciar (Windows)
     app = AplicacionPrincipal(root)
     root.mainloop()
 
