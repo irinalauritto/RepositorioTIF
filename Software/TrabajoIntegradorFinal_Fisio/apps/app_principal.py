@@ -89,7 +89,12 @@ class AplicacionPrincipal:
         menu_button_imagen.pack(side='left', padx=5, pady=5)
 
         # Botón "Ayuda"
-        ayudaBoton = tk.Button(self.frameBarraTareas, text="Ayuda", command=lambda: messagebox.showinfo("Ayuda", "Aquí va la ayuda."), relief=tk.RAISED)
+        ayudaBoton = tk.Button(
+            self.frameBarraTareas,
+            text="Ayuda",
+            command=self.mostrar_ayuda,  # Cambia el comando aquí
+            relief=tk.RAISED
+        )
         ayudaBoton.pack(side='left', padx=5, pady=5)
 
         # Grid principal con fondo personalizado
@@ -503,6 +508,37 @@ class AplicacionPrincipal:
         # Redimensionar imagen de galería al cambiar tamaño de ventana
         self.frameGaleria.bind("<Configure>", self.redimensionar_imagen_galeria)
         self.galeria_img_label.bind("<Configure>", self.redimensionar_imagen_galeria)
+
+    def mostrar_ayuda(self):
+        ayuda_win = tk.Toplevel(self.root)
+        ayuda_win.title("Ayuda")
+        ayuda_win.configure(bg="white")
+
+        # Cargar imagen de ayuda
+        try:
+            img_path = "\\ayuda\\legends.png"
+            imagen = Image.open(img_path)
+            imagen = imagen.resize((400, 300))  # Ajusta el tamaño según lo necesario
+            img_tk = ImageTk.PhotoImage(imagen)
+        except Exception as e:
+            img_tk = None
+
+        # Frame para imagen y texto
+        frame = tk.Frame(ayuda_win, bg="white")
+        frame.pack(padx=20, pady=20)
+
+        # Mostrar imagen
+        if img_tk:
+            label_img = tk.Label(frame, image=img_tk, bg="white")
+            label_img.image = img_tk  # Mantener referencia
+            label_img.pack()
+        else:
+            label_img = tk.Label(frame, text="No se pudo cargar la imagen.", bg="white")
+            label_img.pack()
+
+        # Texto sobre la imagen
+        label_texto = tk.Label(frame, text="Aquí puedes agregar el texto de ayuda sobre la imagen.", bg="white", font=("Arial", 12), wraplength=380, justify="center")
+        label_texto.pack(pady=10)
 
     def actualizarValores(self):
         self.condicion = self.condicionSeleccionada.get()

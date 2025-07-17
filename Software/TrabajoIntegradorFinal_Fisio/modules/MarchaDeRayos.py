@@ -176,7 +176,7 @@ class MarchaDeRayos:
                 'y', linewidth=0.5
             )
 
-        self.ax.legend(fontsize=tamanoLegends, loc='lower left')  # Muestra la leyenda
+        #self.ax.legend(fontsize=tamanoLegends, loc='lower left')  # Muestra la leyenda
         self.ax.figure.canvas.draw()  # Actualiza el gráfico
 
     def saludo(self):
