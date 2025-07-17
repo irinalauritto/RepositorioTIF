@@ -294,13 +294,8 @@ class AplicacionPrincipal:
         try:
             ruta = f"\\RepositorioTIF\\Software\\TrabajoIntegradorFinal_Fisio\\imagenes\\{datos['archivo']}"
             imagen = gImagen.mostrar_imagen(ruta)
-            # Obtiene el tamaño actual del label
-            w = self.galeria_img_label.winfo_width()
-            h = self.galeria_img_label.winfo_height()
-            # Si el label aún no tiene tamaño, usa un valor por defecto
-            if w < 50 or h < 50:
-                w, h = 1600, 1200
-          
+            # Redimensiona la imagen al tamaño fijo 528x397
+            imagen = imagen.resize((528, 397), Image.LANCZOS) # Tamaño con el que quiero que se muestren las imagenes
             img_tk = ImageTk.PhotoImage(imagen)
         except Exception as e:
             print(f"Error cargando imagen de galería: {e}")
@@ -330,8 +325,7 @@ class AplicacionPrincipal:
             self.mostrar_imagen_galeria()
 
     def configuracionDePreguntas(self):
-        import tkinter.font as tkFont
-        # Banco de preguntas (puedes agregar más)
+        # Banco de preguntas
         banco_preguntas = [
             {
                 "pregunta": "¿Cuál es la distancia focal del ojo humano emétrope?",
@@ -413,67 +407,44 @@ class AplicacionPrincipal:
                 ],
                 "respuesta": "B"
             }
+            
         ]
 
         # Selecciona 3 preguntas al azar y en orden aleatorio
         self.preguntas = random.sample(banco_preguntas, 3)
 
-        # Limpia el frame antes de agregar widgets
-        for widget in self.framePreguntas.winfo_children():
-            widget.destroy()
-
-        self.respuestas_usuario = [tk.StringVar(value="") for _ in self.preguntas]
+        self.respuestas_usuario = [tk.StringVar() for _ in self.preguntas]
         self.resultados = [None for _ in self.preguntas]
-        self.marcadores = []  # Para los labels de tick/cruz
-
-        pregunta_frames = []
 
         def verificar_individual(idx):
             correcta = self.preguntas[idx]["respuesta"]
             seleccion = self.respuestas_usuario[idx].get()
-            # Limpia todos los marcadores antes de marcar
-            for lbl in self.marcadores[idx]:
-                lbl.config(text="")
-            if seleccion == "":
-                return  # No marcar nada si no eligió
-            for i, opcion in enumerate(self.preguntas[idx]["opciones"]):
-                letra = opcion[0]
-                if seleccion == letra:
-                    if seleccion == correcta:
-                        self.marcadores[idx][i].config(text="✔️", fg="green")
-                        self.resultados[idx] = True
-                    else:
-                        self.marcadores[idx][i].config(text="❌", fg="red")
-                        self.resultados[idx] = False
-                elif letra == correcta and seleccion != correcta:
-                    self.marcadores[idx][i].config(text="✔️", fg="green")
+            if seleccion == correcta:
+                messagebox.showinfo("Correcto", "¡Respuesta correcta!")
+                self.resultados[idx] = True
+            else:
+                messagebox.showinfo("Incorrecto", "Respuesta incorrecta.")
+                self.resultados[idx] = False
+
+        # Limpia el frame antes de agregar widgets (por si se llama más de una vez)
+        for widget in self.framePreguntas.winfo_children():
+            widget.destroy()
 
         # Mostrar todas las preguntas
         for idx, pregunta in enumerate(self.preguntas):
             frame_preg = tk.Frame(self.framePreguntas, bg="#f5f5f5", bd=2, relief=tk.GROOVE)
             frame_preg.pack(padx=10, pady=10, fill="x")
-            pregunta_frames.append(frame_preg)
 
             tk.Label(frame_preg, text=f"{idx+1}. {pregunta['pregunta']}", bg="#f5f5f5", font=("Arial", 12)).pack(anchor="w", pady=(5, 2))
 
-            marcadores_opciones = []
-            opciones_frame = tk.Frame(frame_preg, bg="#f5f5f5")
-            opciones_frame.pack(anchor="w")
-            for i, opcion in enumerate(pregunta["opciones"]):
-                subframe = tk.Frame(opciones_frame, bg="#f5f5f5")
-                subframe.pack(anchor="w")
-                rb = tk.Radiobutton(
-                    subframe,
+            for opcion in pregunta["opciones"]:
+                tk.Radiobutton(
+                    frame_preg,
                     text=opcion,
                     variable=self.respuestas_usuario[idx],
                     value=opcion[0],  # "A", "B", etc.
                     bg="#f5f5f5"
-                )
-                rb.pack(side="left")
-                lbl = tk.Label(subframe, text="", bg="#f5f5f5", font=("Arial", 14, "bold"))
-                lbl.pack(side="left", padx=10)
-                marcadores_opciones.append(lbl)
-            self.marcadores.append(marcadores_opciones)
+                ).pack(anchor="w", padx=30)
 
             tk.Button(
                 frame_preg,
@@ -481,18 +452,13 @@ class AplicacionPrincipal:
                 command=lambda i=idx: verificar_individual(i)
             ).pack(anchor="e", pady=5)
 
-        # Calificación
-        self.calificacion_label = tk.Label(self.framePreguntas, text="", bg="#f5f5f5", font=("Arial", 14, "bold"))
-        self.calificacion_label.pack(pady=10)
-
         def calificar():
             correctas = 0
             total = len(self.preguntas)
             for idx, pregunta in enumerate(self.preguntas):
                 if self.respuestas_usuario[idx].get() == pregunta["respuesta"]:
                     correctas += 1
-            nota = round(correctas / total * 10, 2)
-            self.calificacion_label.config(text=f"Respuestas correctas: {correctas} de {total}   Nota: {nota}/10")
+            messagebox.showinfo("Calificación", f"Respuestas correctas: {correctas} de {total}\nNota: {round(correctas/total*10, 2)}/10")
 
         tk.Button(self.framePreguntas, text="Calificar", command=calificar, bg="#3b82f6", fg="white", font=("Arial", 12, "bold")).pack(pady=20)
 
@@ -512,6 +478,21 @@ class AplicacionPrincipal:
                 "archivo": "manejar_hipermetrope.jpg",
                 "titulo": "Hipermétrope",
                 "descripcion": "Visión de un hipermétrope al manejar."
+            },
+            {
+                "archivo": "aula_emetrope.jpg",
+                "titulo": "Emétrope",
+                "descripcion": "Visión de un emétrope en un aula."
+            },
+            {
+                "archivo": "aula_miope.jpg",
+                "titulo": "Miope",
+                "descripcion": "Visión de un miope en un aula."
+            },
+            {
+                "archivo": "aula_hipermetrope.jpg",
+                "titulo": "Hipermétrope",
+                "descripcion": "Visión de un hipermétrope en un aula."
             },
             # Agrega más imágenes aquí
         ]
@@ -556,9 +537,9 @@ class AplicacionPrincipal:
 
         # Cargar imagen de ayuda
         try:
-            img_path = "\\ayuda\\legends.png"
+            img_path = "\\RepositorioTIF\\Software\\TrabajoIntegradorFinal_Fisio\\ayuda\\legends.png"
             imagen = Image.open(img_path)
-            imagen = imagen.resize((400, 300))  # Ajusta el tamaño según lo necesario
+            imagen = imagen.resize((200, 200))  # Ajusta el tamaño según lo necesario
             img_tk = ImageTk.PhotoImage(imagen)
         except Exception as e:
             img_tk = None
@@ -577,7 +558,8 @@ class AplicacionPrincipal:
             label_img.pack()
 
         # Texto sobre la imagen
-        label_texto = tk.Label(frame, text="Aquí puedes agregar el texto de ayuda sobre la imagen.", bg="white", font=("Arial", 12), wraplength=380, justify="center")
+        label_texto = tk.Label(frame, text="Selecciona una condición para el ojo, grado de patología y la distancia a la que se ubicará el objeto, luego clickea el botón Actualizar.\nAbajo a la izquierda tendrás información sobre la situación elegida.", 
+                               bg="white", font=("Arial", 12), wraplength=380, justify="center")
         label_texto.pack(pady=10)
 
     def actualizarValores(self):
