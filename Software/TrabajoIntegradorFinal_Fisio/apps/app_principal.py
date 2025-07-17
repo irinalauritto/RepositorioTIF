@@ -526,9 +526,9 @@ class AplicacionPrincipal:
 
         # Cargar imagen de ayuda
         try:
-            img_path = "\\ayuda\\legends.png"
+            img_path = "\\RepositorioTIF\\Software\\TrabajoIntegradorFinal_Fisio\\ayuda\\legends.png"
             imagen = Image.open(img_path)
-            imagen = imagen.resize((400, 300))  # Ajusta el tamaño según lo necesario
+            imagen = imagen.resize((200, 200))  # Ajusta el tamaño según lo necesario
             img_tk = ImageTk.PhotoImage(imagen)
         except Exception as e:
             img_tk = None
@@ -547,7 +547,8 @@ class AplicacionPrincipal:
             label_img.pack()
 
         # Texto sobre la imagen
-        label_texto = tk.Label(frame, text="Aquí puedes agregar el texto de ayuda sobre la imagen.", bg="white", font=("Arial", 12), wraplength=380, justify="center")
+        label_texto = tk.Label(frame, text="Selecciona una condición para el ojo, grado de patología y la distancia a la que se ubicará el objeto, luego clickea el botón Actualizar.\nAbajo a la izquierda tendrás información sobre la situación elegida.", 
+                               bg="white", font=("Arial", 12), wraplength=380, justify="center")
         label_texto.pack(pady=10)
 
     def actualizarValores(self):
