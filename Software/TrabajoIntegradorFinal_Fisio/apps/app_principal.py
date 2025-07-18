@@ -44,8 +44,40 @@ class AplicacionPrincipal:
 
         self.root.configure(bg="#c9c9c9")
 
-        # Crea el notebook (pestañas)
-        self.notebook = ttk.Notebook(self.root)
+        # --- SCROLL GENERAL (vertical y horizontal) ---
+        contenedor = tk.Frame(self.root, bg="#c9c9c9")
+        contenedor.grid(row=0, column=0, sticky="nsew")
+        self.root.grid_rowconfigure(0, weight=1)
+        self.root.grid_columnconfigure(0, weight=1)
+
+        canvas = tk.Canvas(contenedor, bg="#c9c9c9", highlightthickness=0)
+        canvas.grid(row=0, column=0, sticky="nsew")
+
+        v_scroll = tk.Scrollbar(contenedor, orient="vertical", command=canvas.yview)
+        v_scroll.grid(row=0, column=1, sticky="ns")
+
+        h_scroll = tk.Scrollbar(contenedor, orient="horizontal", command=canvas.xview)
+        h_scroll.grid(row=1, column=0, sticky="ew")
+
+        contenedor.grid_rowconfigure(0, weight=1)
+        contenedor.grid_columnconfigure(0, weight=1)
+
+        canvas.configure(yscrollcommand=v_scroll.set, xscrollcommand=h_scroll.set)
+
+        # Frame donde irá TODO el contenido
+        frame_contenido = tk.Frame(canvas, bg="#c9c9c9")
+        window_id = canvas.create_window((0, 0), window=frame_contenido, anchor="nw")
+
+        def actualizar_scroll(event):
+            canvas.configure(scrollregion=canvas.bbox("all"))
+        frame_contenido.bind("<Configure>", actualizar_scroll)
+
+        def resize_frame(event):
+            canvas.itemconfig(window_id, width=event.width)
+        canvas.bind("<Configure>", resize_frame)
+
+        # --- NOTEBOOK DENTRO DEL CANVAS ---
+        self.notebook = ttk.Notebook(frame_contenido)
         self.notebook.pack(expand=True, fill='both')
 
         # Frame para la simulación
@@ -684,6 +716,8 @@ class AplicacionPrincipal:
 def ejecutar_gui():
     root = tk.Tk()
     root.state('zoomed')  # Maximiza la ventana al iniciar (Windows)
+    root.geometry("1000x700")
+
     app = AplicacionPrincipal(root)
     root.mainloop()
 
