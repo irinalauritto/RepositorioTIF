@@ -12,7 +12,9 @@ import modules.Miopia as m
 import modules.Emetropia as e
 from tkinter import ttk
 import random
-
+import sys
+import os
+# Original 
 # Creacion de objetos
 gArchivos = ga.gestorDeArchivos("Gestor de Archivos")
 gImagen = gi.gestorDeImagenes("Gestor de Imagenes")
@@ -22,7 +24,7 @@ miopia = m.Miopia("Miope",1)
 emetropia = e.Emetropia("Emétrope")
 
 # Carga de archivos
-gArchivos.extraeListadoDeArchivos("\\RepositorioTIF\\Software\\TrabajoIntegradorFinal_Fisio\\imagenes_nuevas")
+gArchivos.extraeListadoDeArchivos("imagenes\\pestana_simulacion")
 directoriosImagenes = gArchivos.getListadoDeArchivos()
 print("Archivos cargados desde el directorio:")
 for archivo in directoriosImagenes:
@@ -33,6 +35,16 @@ distancias = ["0.10 m","0.25 m", "0.33 m", "0.50 m", "1 m", "2 m", "10 m", "15 m
 
 # Variable auxiliar de limite de difuminación en las imagenes arbol y vela
 limiteDifuminacion = 10
+
+def resource_path(relative_path):
+    """Obtiene la ruta absoluta al recurso, funciona para dev y para PyInstaller."""
+    try:
+        # PyInstaller crea una carpeta temporal y almacena el path en _MEIPASS
+        base_path = sys._MEIPASS
+    except AttributeError:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
 
 class AplicacionPrincipal:
     """Clase principal de la aplicación."""
@@ -294,7 +306,8 @@ class AplicacionPrincipal:
     def mostrarImagen(self, index):
         if index < len(directoriosImagenes):
             print(f"Mostrando imagen {index}")
-            imagen_path = "\\RepositorioTIF\\Software\\TrabajoIntegradorFinal_Fisio\\imagenes_nuevas\\" + directoriosImagenes[index]
+            #imagen_path = "imagenes\\pestana_simulacion\\" + directoriosImagenes[index]
+            imagen_path = resource_path("imagenes\\pestana_simulacion\\" + directoriosImagenes[index])
             print(f"Ruta de la imagen: {imagen_path}")
             imagen = gImagen.mostrar_imagen(imagen_path)
             imagen = imagen.resize((400, 500))
@@ -307,7 +320,8 @@ class AplicacionPrincipal:
             gradoDifuminacion = limiteDifuminacion
         if index < len(directoriosImagenes):
             print(f"Mostrando imagen {index}")
-            imagen_path = "\\RepositorioTIF\\Software\\TrabajoIntegradorFinal_Fisio\\imagenes_nuevas\\" + directoriosImagenes[index]
+            #imagen_path = "imagenes\\pestana_simulacion\\" + directoriosImagenes[index]
+            imagen_path = resource_path("imagenes\\pestana_simulacion\\" + directoriosImagenes[index])
             print(f"Ruta de la imagen: {imagen_path}")
             imagen = gImagen.mostrar_imagen(imagen_path)
             imagen = imagen.resize((400, 500))
@@ -324,8 +338,9 @@ class AplicacionPrincipal:
     def mostrar_imagen_galeria(self):
         datos = self.imagenes_galeria[self.galeria_index]
         try:
-            ruta = f"\\RepositorioTIF\\Software\\TrabajoIntegradorFinal_Fisio\\imagenes\\{datos['archivo']}"
-            imagen = gImagen.mostrar_imagen(ruta)
+            #ruta = f"imagenes\\pestana_imagenes\\{datos['archivo']}"
+            imagen_path = resource_path(f"imagenes\\pestana_imagenes\\{datos['archivo']}")
+            imagen = gImagen.mostrar_imagen(imagen_path)
             # Redimensiona la imagen al tamaño fijo 528x397
             imagen = imagen.resize((900,700), Image.LANCZOS) # Tamaño con el que quiero que se muestren las imagenes
             img_tk = ImageTk.PhotoImage(imagen)
@@ -610,7 +625,8 @@ class AplicacionPrincipal:
 
         # Cargar imagen de ayuda
         try:
-            img_path = "\\RepositorioTIF\\Software\\TrabajoIntegradorFinal_Fisio\\ayuda\\legends.png"
+            #img_path = "imagenes\\boton_ayuda\\legends.png"
+            img_path = resource_path("imagenes\\boton_ayuda\\legends.png")
             imagen = Image.open(img_path)
             imagen = imagen.resize((200, 200))  # Ajusta el tamaño según lo necesario
             img_tk = ImageTk.PhotoImage(imagen)
@@ -715,8 +731,18 @@ class AplicacionPrincipal:
     
 def ejecutar_gui():
     root = tk.Tk()
-    root.state('zoomed')  # Maximiza la ventana al iniciar (Windows)
+    #root.iconbitmap(resource_path("icono_simulador.ico")) # esta linea rompe el 'zoomed'
+    w = round(root.winfo_screenwidth()*0.651)
+    h = round(root.winfo_screenheight()*0.8102)
+
+    tamano = f"{w}x{h}"
+    print("Tamaño: "+tamano)
+
+    root.geometry(tamano+str(round(w/2))+str(round(h/2))) # Tamaño inicial sugerido (puedes ajustar)
     root.geometry("1000x700")
+    #root.geometry(tamano)
+    root.state('normal')  # Maximiza la ventana al iniciar (Windows)
+    
 
     app = AplicacionPrincipal(root)
     root.mainloop()
